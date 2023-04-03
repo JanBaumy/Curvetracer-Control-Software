@@ -1,5 +1,4 @@
 #higher level functions implementing all different modes
-import multiprocessing
 from externalDeviceControl import *
 
 #function to start the temperature measurement in parallel
