@@ -1,4 +1,6 @@
 #debug function to test the workflow
+from sys import path
+path.append('../Curvetracer Control Software')
 
 from externalDeviceControl import *
 from dataAnalysis import *
