@@ -1,5 +1,4 @@
-#functions to control all external hardware devices
-
+#basic functions to control all external hardware devices
 huber_pilot_one_host = "192.168.0.90"
 huber_pilot_one_port = 8101
 fug_host = "192.168.0.42"
