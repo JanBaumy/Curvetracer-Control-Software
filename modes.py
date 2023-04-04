@@ -31,7 +31,7 @@ def voltage_sweep(start_voltage, end_voltage, step):
 
 #function to go through each temperature
 #config needs to be a dict with these keys: mode, limit_resistor AND EITHER voltage OR start_voltage, end_voltage, step
-def temperature_sweep(temperature_list, temperature_tolerance, config):
+def temperature_sweep(config):
     #check for validity of config dict
     if 'mode' not in config:
         print('ERROR: No mode selected')
@@ -41,14 +41,17 @@ def temperature_sweep(temperature_list, temperature_tolerance, config):
     if mode != 'voltage' and mode != 'voltage_sweep':
         print('ERROR: Invalid mode selected')
         return False
+
+    #extract information for all modes
+    temperature_list = config.get('temperature_list')
+    temperature_tolerance = config.get('temperature_tolerance')
+    limit_resistor = config.get('limit_resistor')
+
+    if 'file_path' in config:
+        file_path = config.get('file_path')
+        save_to_file = True
     else:
-        #extract information for all modes
-        limit_resistor=config.get('limit_resistor')
-        if 'file_path' in config:
-            file_path = config.get('file_path')
-            save_to_file = True
-        else:
-            save_to_file = False
+        save_to_file = False
 
     #go through each temperature
     for set_temperature in temperature_list:
