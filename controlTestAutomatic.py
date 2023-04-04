@@ -1,8 +1,11 @@
-from modes import temperature_sweep, no_temperature
+from modes import temperature_sweep, no_temperature, initialize_hardware
 from saveData import check_and_create_file
 
 def main():
     temperature_list = [20, 25, 30, 35]
+
+    #sets the maximum current to 5mA and no limit resistor
+    initialize_hardware(5e-3, 'short')
 
     #set the parameters for the sweep loop measurement
     file1 = 'automatic_test_temp_sweep.csv'
