@@ -6,7 +6,6 @@ def import_config(file_path):
         config = json.load(file)
     return config
 
-
 def export_config(config, file_path):
     with open(file_path, 'w') as outfile:
         json.dump(config, outfile)
