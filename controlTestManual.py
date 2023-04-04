@@ -9,7 +9,7 @@ def main():
 
     #config ----------------------------
     create_file = False
-    file_path = "C:/test.csv"
+    file_path = "manual_test.csv"
 
     input_voltage = 20
     input_current = 5e-3
@@ -17,7 +17,7 @@ def main():
     has_temperature = True
     input_temperature = 35
 
-    limit_resistor = '12M'
+    limit_resistor = 'short'
     #config end -------------------------
 
     #create the csv file
