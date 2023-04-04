@@ -6,10 +6,12 @@ from modes import no_temperature, temperature_sweep
 
 def main():
     #get config
-    config_path = r'Basic Configs\1M2_resistor_test_no_temp.json'
+    config_path = r'Basic Configs\invalid_config.json'
     config = import_config(config_path)
-    if not check_config(config):
-        print('ERROR: Config file is invalid!')
+    #check config
+    valid_config = check_config(config)
+    if valid_config != True:
+        print(valid_config)
         return
 
     print('-----CONFIG:-----')
@@ -20,11 +22,14 @@ def main():
     config['file_path'] = config.get('save_folder') + f'\{file_path}'
     print(f'INFO: File will be saved to: {config.get("file_path")}')
 
+    print("INFO: Measurement starting----------------")
     #start measurement
     if config.get('has_temperature') == True:
-        temperature_sweep(config)
+        #temperature_sweep(config)
+        pass
     else:
-        no_temperature(config)
+        #no_temperature(config)
+        pass
 
 if __name__ == '__main__':
     main()
