@@ -4,6 +4,24 @@ from dataAnalysis import *
 from saveData import *
 import time
 
+def initialize_hardware(maximum_current, limit_resistor):
+    if not fug_clear():
+        exit('ERROR: Fug could not be reset')
+
+    #initialize the HV source
+    if not fug_set_current(maximum_current):
+        exit('ERROR: Fug could not set current')
+
+    if not fug_enable_output(True):
+        exit('ERROR: Fug could not enable output')
+
+    #initialize the RIO unit
+    initialize_FPGA()
+
+    #set limit resistor and enable power
+    set_limit_resistor(resistor=limit_resistor)
+    enable_power_FPGA()
+
 #function to apply a single voltage and return the current
 def single_voltage(voltage):
     fug_set_voltage(voltage)
