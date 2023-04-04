@@ -50,7 +50,6 @@ def huber_set_temperature(set_temperature):
 
     return False
 
-
 #-----FUG DEVICE----- ----------------------------------------------------------------------
 #function to set the voltage of the Fug HV source
 def fug_set_voltage(voltage):
