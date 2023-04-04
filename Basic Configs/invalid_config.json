@@ -1,0 +1,10 @@
+{
+    "has_temperature": false,
+    "mode": "voltage_sweep",
+    "limit_resistor": "short",
+    "input_current": 0.005,
+    "start_voltage": 0,
+    "end_voltage": 1000,
+    "save_to_file": true,
+    "save_folder": "C:\\Users\\Jan\\Desktop\\SHA-Curvetracer TEST"
+}
