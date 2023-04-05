@@ -4,12 +4,16 @@ from dataAnalysis import *
 from saveData import *
 from time import sleep
 
-def initialize_hardware(maximum_current, limit_resistor):
+def initialize_hardware(config):
+    #get parameters from input dict
+    input_current = config.get('input_current')
+    limit_resistor = config.get('limit_resistor')
+    
     if not fug_clear():
         exit('ERROR: Fug could not be reset')
 
     #initialize the HV source
-    if not fug_set_current(maximum_current):
+    if not fug_set_current(input_current):
         exit('ERROR: Fug could not set current')
 
     if not fug_enable_output(True):
