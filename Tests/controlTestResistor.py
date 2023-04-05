@@ -4,7 +4,10 @@ path.append('../Curvetracer Control Software')
 from configLoader import import_config, check_config
 from saveData import check_and_create_file
 from modes import no_temperature, temperature_sweep
+from plotData import draw_plots
+import matplotlib.pyplot as plt
 from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
+import multiprocessing as mp
 
 def main():
     #get config
@@ -15,7 +18,7 @@ def main():
     if valid_config != True:
         print(valid_config)
         return
-
+    
     print('-----CONFIG:-----')
     for key in config:
         print(f'{key}: {config[key]}')
@@ -28,9 +31,16 @@ def main():
     print("INFO: Measurement starting----------------")
     #start measurement
     if config.get('has_temperature') == True:
-        fake_temperature_sweep(config)
+        p1 = mp.Process(target=fake_temperature_sweep, args=(config,))
     else:
-        fake_no_temperature(config)
+        p1 = mp.Process(target=fake_no_temperature, args=(config,))
+
+    #start measurement in parallel thread
+    p1.start()
+    plot = draw_plots(config)
+    plt.show()
+    #stop measurement process after it is done
+    p1.join()
 
 if __name__ == '__main__':
     main()

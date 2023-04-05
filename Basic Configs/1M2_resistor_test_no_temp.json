@@ -5,7 +5,8 @@
     "input_current": 0.005,
     "start_voltage": 0,
     "end_voltage": 1000,
-    "step": 25,
+    "step": 100,
     "save_to_file": true,
-    "save_folder": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\"
+    "save_folder": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\",
+    "file_path": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\TEST.csv"
 }

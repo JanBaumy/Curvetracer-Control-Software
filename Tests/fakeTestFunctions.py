@@ -110,6 +110,8 @@ def fake_no_temperature(config):
             if save_to_file:
                 if not append_to_csv(file_path, csv_line):
                     print("WARNING: Failed to save data to file")
+            print('INFO: Voltage sweep measurement step done, going to sleep for 1 seconds')
+            sleep(1)
 
     return True
 
