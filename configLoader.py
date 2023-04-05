@@ -73,5 +73,4 @@ def check_config(config):
         if type(config.get('save_folder')) != str:
             return "ERROR: Save folder is not a string."
         
-    return True
-            
+    return True           
