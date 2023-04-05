@@ -1,5 +1,7 @@
 {
-    "has_temperature": false,
+    "has_temperature": true,
+    "temperature_list": [20, 30, 40, 50],
+    "temperature_tolerance": 2,
     "mode": "voltage_sweep",
     "limit_resistor": "short",
     "input_current": 0.005,
