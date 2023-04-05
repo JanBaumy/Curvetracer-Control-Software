@@ -2,7 +2,6 @@
 from dataAnalysis import *
 from saveData import *
 from time import sleep
-import random
 
 #function to go through each temperature
 #config needs to be a dict with these keys: mode, limit_resistor AND EITHER voltage OR start_voltage, end_voltage, step
@@ -16,15 +15,12 @@ def fake_temperature_sweep(config):
 
     #go through each temperature
     for set_temperature in temperature_list:
-        #ensure to set temperature correctly
-        if not fake_huber_set_temperature(set_temperature):
-            print('ERROR: Failed to set temperature')
-            return False
+        #set temperature
+        fake_huber_set_temperature(set_temperature)
 
         #wait for temperature to be reached
-        while not fake_set_temperature_reached(set_temperature, temperature_tolerance):
-            print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(set_temperature, 3)}')
-            sleep(5)
+        print('INFO: Waiting to reach temperature, going to sleep for 5 seconds')
+        sleep(5)
         print(f'INFO: Temperature reached: {round(set_temperature, 3)}')
 
         #start the corresponding measurement
@@ -40,6 +36,8 @@ def fake_temperature_sweep(config):
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
+            print('INFO: Single voltage measurement step done, going to sleep for 5 seconds')
+            sleep(5)
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -56,6 +54,10 @@ def fake_temperature_sweep(config):
                 csv_line = [set_temperature, actual_temperature, dut_voltage, current]
                 if save_to_file:
                     append_to_csv(file_path, csv_line)
+                print('INFO: Voltage sweep measurement step done, going to sleep for 5 seconds')
+                sleep(5)
+        print('INFO: Temperature measurement step done, going to sleep for 10 seconds')
+        sleep(10)
 
     return True
 
