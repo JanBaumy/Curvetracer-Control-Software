@@ -2,7 +2,7 @@
 from externalDeviceControl import *
 from dataAnalysis import *
 from saveData import *
-import time
+from time import sleep
 
 def initialize_hardware(maximum_current, limit_resistor):
     if not fug_clear():
@@ -81,7 +81,7 @@ def temperature_sweep(config):
         #wait for temperature to be reached
         while not set_temperature_reached(set_temperature, temperature_tolerance):
             print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(measure_temperature(), 3)}')
-            time.sleep(30)
+            sleep(30)
         print(f'INFO: Temperature reached: {round(measure_temperature(), 3)}')
 
         #start the corresponding measurement
