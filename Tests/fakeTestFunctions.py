@@ -1,6 +1,7 @@
 #fake functions to test without hardware
 from dataAnalysis import *
 from saveData import *
+from random import uniform
 from time import sleep
 
 #function to go through each temperature
@@ -36,8 +37,8 @@ def fake_temperature_sweep(config):
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
-            print('INFO: Single voltage measurement step done, going to sleep for 5 seconds')
-            sleep(5)
+            print('INFO: Single voltage measurement step done, going to sleep for 1 seconds')
+            sleep(1)
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -54,8 +55,8 @@ def fake_temperature_sweep(config):
                 csv_line = [set_temperature, actual_temperature, dut_voltage, current]
                 if save_to_file:
                     append_to_csv(file_path, csv_line)
-                print('INFO: Voltage sweep measurement step done, going to sleep for 5 seconds')
-                sleep(5)
+                print('INFO: Voltage sweep measurement step done, going to sleep for 1 seconds')
+                sleep(1)
         print('INFO: Temperature measurement step done, going to sleep for 10 seconds')
         sleep(10)
 
@@ -116,7 +117,7 @@ def fake_huber_set_temperature(set_temperature):
     return True
 
 def fake_single_voltage(voltage):
-    return voltage / 1000
+    return (voltage / 1000) * round(uniform(0.8, 1.2), 3)
 
 def fake_voltage_sweep(start_voltage, end_voltage, step):
     for voltage in range(start_voltage, end_voltage, step):
