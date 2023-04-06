@@ -70,7 +70,7 @@ class GUI:
             print(valid_config)
             return
 
-        if os.path.exists(self.config.get('file_path')):
+        if os.path.exists(self.config.get('file_path')) and not self.config.get('plot_previous_data'):
             self.previous_data = sum(1 for line in open(self.config.get('file_path')))
         else:
             self.previous_data = 1
@@ -98,7 +98,7 @@ class AnimationThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.previous_data, self.gui.config), cache_frame_data=False, interval=500)
+        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.previous_data, self.gui.config), cache_frame_data=False, interval=10)
 
     def stop(self):
         self.gui.animation._stop()

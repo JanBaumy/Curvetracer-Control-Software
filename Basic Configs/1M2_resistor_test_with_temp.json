@@ -11,5 +11,6 @@
     "step": 100,
     "save_to_file": true,
     "save_folder": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\",
-    "file_path": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\TEST.csv"
+    "file_path": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\TEST.csv",
+    "plot_previous_data": true
 }

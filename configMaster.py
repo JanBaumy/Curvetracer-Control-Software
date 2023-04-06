@@ -11,7 +11,8 @@ no_temp_single_voltage = dict(has_temperature=False,\
                                 maximum_current=50e-6,\
                                 voltage=3000,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder)
+                                save_folder=measurement_folder,\
+                                plot_previous_data=False)
 
 no_temp_sweep_voltage = dict(has_temperature=False,\
                                 mode='voltage_sweep',\
@@ -22,7 +23,8 @@ no_temp_sweep_voltage = dict(has_temperature=False,\
                                 end_voltage=3000,\
                                 step=50,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder)
+                                save_folder=measurement_folder,\
+                                    plot_previous_data=False)
 
 temp_single_voltage = dict(has_temperature=True,\
                                 mode='voltage',\
@@ -32,7 +34,8 @@ temp_single_voltage = dict(has_temperature=True,\
                                 temperature_list=[22, 32, 42, 52, 62, 72, 82, 92, 102],\
                                 temperature_tolerance=2,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder)
+                                save_folder=measurement_folder,\
+                                    plot_previous_data=False)
 
 temp_sweep_voltage = dict(has_temperature=True,\
                                 mode='voltage_sweep',\
@@ -45,7 +48,8 @@ temp_sweep_voltage = dict(has_temperature=True,\
                                 end_voltage=3000,\
                                 step=50,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder)
+                                save_folder=measurement_folder,\
+                                    plot_previous_data=False)
 
 null_config = dict(has_temperature=True,\
                     mode='voltage_sweep',\
@@ -59,7 +63,8 @@ null_config = dict(has_temperature=True,\
                     step=0,\
                     save_to_file=False,\
                     save_folder=measurement_folder,
-                    file_path='null_measurement.csv')
+                    file_path='null_measurement.csv',\
+                        plot_previous_data=False)
 
 #export the configs
 print('Regenerating basic configs')
