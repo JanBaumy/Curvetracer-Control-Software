@@ -47,9 +47,24 @@ temp_sweep_voltage = dict(has_temperature=True,\
                                 save_to_file=True,\
                                 save_folder=measurement_folder)
 
+null_config = dict(has_temperature=True,\
+                    mode='voltage_sweep',\
+                    limit_resistor='short',\
+                    input_current=0,\
+                    maximum_current=0,\
+                    temperature_list=0,\
+                    temperature_tolerance=0,\
+                    start_voltage=0,\
+                    end_voltage=0,\
+                    step=0,\
+                    save_to_file=False,\
+                    save_folder=measurement_folder,
+                    file_path='null_measurement.csv')
+
 #export the configs
 print('Regenerating basic configs')
 export_config(no_temp_single_voltage, 'Basic Configs/no_temp_single_voltage.json')
 export_config(no_temp_sweep_voltage, 'Basic Configs/no_temp_sweep_voltage.json')
 export_config(temp_single_voltage, 'Basic Configs/temp_single_voltage.json')
 export_config(temp_sweep_voltage, 'Basic Configs/temp_sweep_voltage.json')
+export_config(null_config, 'Basic Configs/null_config.json')
