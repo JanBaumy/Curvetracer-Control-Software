@@ -58,6 +58,7 @@ def temperature_sweep(config):
     temperature_list = config.get('temperature_list')
     temperature_tolerance = config.get('temperature_tolerance')
     limit_resistor = config.get('limit_resistor')
+    maximum_current = config.get('maximum_current')
     save_to_file = config.get('save_to_file')
     file_path = config.get('file_path')
 
@@ -87,6 +88,8 @@ def temperature_sweep(config):
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
+            if current >= maximum_current and maximum_current != 0:
+                print('INFO: Current limit exceeded')
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -103,6 +106,9 @@ def temperature_sweep(config):
                 csv_line = [set_temperature, actual_temperature, dut_voltage, current]
                 if save_to_file == True:
                     append_to_csv(file_path, csv_line)
+                if current >= maximum_current and maximum_current != 0:
+                    print('INFO: Current limit exceeded')
+                    break
 
     return True
 
