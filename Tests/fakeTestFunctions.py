@@ -10,6 +10,7 @@ def fake_temperature_sweep(config):
     mode = config.get('mode')
     temperature_list = config.get('temperature_list')
     temperature_tolerance = config.get('temperature_tolerance')
+    maximum_current = config.get('maximum_current')
     limit_resistor = config.get('limit_resistor')
     save_to_file = config.get('save_to_file')
     file_path = config.get('file_path')
@@ -37,6 +38,9 @@ def fake_temperature_sweep(config):
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
+
+            if current >= maximum_current and maximum_current != 0:
+                print('INFO: Current limit exceeded')
             print('INFO: Single voltage measurement step done, going to sleep for 1 seconds')
             sleep(1)
 
@@ -56,6 +60,9 @@ def fake_temperature_sweep(config):
                 if save_to_file:
                     append_to_csv(file_path, csv_line)
                 print('INFO: Voltage sweep measurement step done, going to sleep for 1 seconds')
+                if current >= maximum_current and maximum_current != 0:
+                    print('INFO: Current limit exceeded, immediately going to next temperature')
+                    break
                 sleep(1)
         print('INFO: Temperature measurement step done, going to sleep for 10 seconds')
         sleep(10)

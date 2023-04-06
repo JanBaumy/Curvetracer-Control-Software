@@ -13,7 +13,7 @@ def main():
     #get config
     config_path = r'Basic Configs\1M2_resistor_test_with_temp.json'
     config = import_config(config_path)
-    #check config
+    #check config and change values if needed
     valid_config = check_config(config)
     if valid_config != True:
         print(valid_config)
@@ -37,7 +37,7 @@ def main():
 
     #start measurement in parallel thread
     p1.start()
-    plot = draw_plots(config)
+    plot = draw_plots(config) #keep reference to plot so it does not get deleted
     plt.show()
     #stop measurement process after it is done
     p1.join()
