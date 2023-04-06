@@ -31,8 +31,8 @@ def fake_temperature_sweep(config):
             voltage = config.get('voltage')
             
             actual_temperature = round(set_temperature, 3)
-            dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
             current = fake_single_voltage(voltage)
+            dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
 
             #make a line to save to csv
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
@@ -126,7 +126,7 @@ def fake_huber_set_temperature(set_temperature):
     return True
 
 def fake_single_voltage(voltage):
-    return (voltage / 1000) * round(uniform(0.8, 1.2), 3)
+    return (voltage / 1200000) * round(uniform(0.9, 1.1), 3)
 
 def fake_voltage_sweep(start_voltage, end_voltage, step):
     for voltage in range(start_voltage, end_voltage, step):
