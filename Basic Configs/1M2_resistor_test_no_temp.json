@@ -3,6 +3,7 @@
     "mode": "voltage_sweep",
     "limit_resistor": "short",
     "input_current": 0.005,
+    "maximum_current": 1,
     "start_voltage": 0,
     "end_voltage": 1000,
     "step": 100,

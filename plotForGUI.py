@@ -53,12 +53,9 @@ def update(i, axs, previous_lines, config):
     file_path = config.get('file_path')
     has_temperature = True if config.get('has_temperature') == True else False
     data = get_raw_data(file_path, previous_lines)
-
-    print(f"ANIM: Update {i}")
     #only plot when there is data
     if data.size > 0:
         animation_data = extract_data(data, has_temperature)
-        #print(animation_data)
 
         colors = ['yellow', 'lawngreen', 'deepskyblue']
 

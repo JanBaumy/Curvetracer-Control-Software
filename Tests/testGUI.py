@@ -4,6 +4,7 @@ import threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.animation import FuncAnimation
 import os
+import ctypes
 from sys import path
 path.append('../Curvetracer Control Software')
 from plotForGUI import *
@@ -12,18 +13,22 @@ from configLoader import *
 from saveData import check_and_create_file
 
 class GUI:
-    fig, axs, animation, measurement = None, None, None, None
+    fig, axs, animation_thread, measurement_thread, canvas = None, None, None, None, None
+    animation = None
     previous_data = 1
 
     def __init__(self):
         self.root = tk.Tk()
 
         #import null config
-        self.config = import_config(r'Basic Configs\1M2_resistor_test_with_temp.json')
+        self.config = import_config(r'Basic Configs\null_config.json')
 
         #make the plot pretty
-        self.canvas = self.create_canvas()
+        self.create_canvas()
         self.create_widgets()
+
+    def run(self):
+        self.root.mainloop()   
 
     def create_widgets(self):
         # Choose config file button
@@ -34,21 +39,24 @@ class GUI:
         start_measurement_button = tk.Button(self.root, text="Start Measurement", command=self.start_measurement)
         start_measurement_button.grid(row=1, column=1)
 
+        # Stop measurement button
+        stop_measurement_button = tk.Button(self.root, text="Stop Measurement", command=self.stop_measurement)
+        stop_measurement_button.grid(row=1, column=2)
+
     def create_canvas(self):
-        global fig, axs
-        fig, axs = init_plot(self.config)
-        for ax in axs:
+        self.fig, self.axs = init_plot(self.config)
+        for ax in self.axs:
             ax.grid(color='white', linestyle='-', linewidth=0.2)
 
-        canvas = FigureCanvasTkAgg(fig, master=self.root)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=0, columnspan=2)
-
-        return canvas
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().grid(row=0, column=0, columnspan=3)
+        self.start_animation_thread()
 
     def redraw_canvas(self):
-        if self.animation != None:
-            self.animation.stop()
+        if self.animation_thread != None:
+            self.animation_thread.stop()
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas.get_tk_widget().delete("all")
         self.canvas = self.create_canvas()
         self.start_animation_thread()
@@ -63,24 +71,26 @@ class GUI:
             return
 
         if os.path.exists(self.config.get('file_path')):
-            previous_lines = sum(1 for line in open(self.config.get('file_path')))
+            self.previous_data = sum(1 for line in open(self.config.get('file_path')))
         else:
-            previous_lines = 1
+            self.previous_data = 1
 
         self.redraw_canvas()
 
     def start_animation_thread(self):
-        self.animation = AnimationThread(self)
-        self.animation.start()
+        self.animation_thread = AnimationThread(self)
+        self.animation_thread.start()
 
     def start_measurement(self):
-        print("Starting measurement")
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
-        self.measurement = MeasurementThread(self)
-        self.measurement.start()
 
-    def run(self):
-        self.root.mainloop()        
+        self.measurement_thread = MeasurementThread(self)
+        self.measurement_thread.start()  
+
+    def stop_measurement(self):
+        if self.measurement_thread != None:
+            self.measurement_thread.raise_exception()
+            self.animation_thread.join()
 
 class AnimationThread(threading.Thread):
     def __init__(self, gui):
@@ -88,18 +98,41 @@ class AnimationThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        self.gui.animation = FuncAnimation(fig, update, fargs=(axs, gui.previous_data, gui.config), cache_frame_data=False, interval=500)
+        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.previous_data, self.gui.config), cache_frame_data=False, interval=500)
+
+    def stop(self):
+        self.gui.animation._stop()
+        self.gui.animation = None
+        self.join()
 
 class MeasurementThread(threading.Thread):
     def __init__(self, gui):
         threading.Thread.__init__(self)
+        self._stop_event = threading.Event()
         self.gui = gui
 
     def run(self):
-        if self.gui.config.get('has_temperature') == True:
-            self.gui.measurement = fake_temperature_sweep(self.gui.config)
-        else:
-            self.gui.measurement = fake_no_temperature(self.gui.config)
+        while not self._stop_event.is_set():
+            if self.gui.config.get('has_temperature') == True:
+                fake_temperature_sweep(self.gui.config)
+            else:
+                fake_no_temperature(self.gui.config)
+
+    def get_id(self): 
+        # returns id of the respective thread
+        if hasattr(self, '_thread_id'):
+            return self._thread_id
+        for id, thread in threading._active.items():
+            if thread is self:
+                return id
+
+    def raise_exception(self):
+        thread_id = self.get_id()
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
+              ctypes.py_object(SystemExit))
+        if res > 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
+            print('Exception raise failure')
 
 if __name__ == "__main__":
     gui = GUI()
