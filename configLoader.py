@@ -27,19 +27,22 @@ def check_config(config):
     #incase mode is voltage
     if config.get('mode') == 'voltage':
         #check all minimmum required keys
-        required_keys = ['voltage', 'limit_resistor', 'input_current']
+        required_keys = ['voltage', 'limit_resistor', 'input_current', 'maximum_current']
         for key in required_keys:
             if key not in config:
                 return f"ERROR: {key} is missing in the config file."
+        
+        #check if voltage is a number above 0
         if not isinstance(config.get('voltage'), (int, float)):
             return "ERROR: Voltage is not a number."
-        if not isinstance(config.get('input_current'), (int, float)):
-            return "ERROR: Input current is not a number."
+        elif config.get('voltage') < 0:
+            print("WARNING: Voltage is negative. Setting it to 0.")
+            config['voltage'] = 0
             
     #incase mode is voltage_sweep
     elif config.get('mode') == 'voltage_sweep':
         #check all minimmum required keys
-        required_keys = ['start_voltage', 'end_voltage', 'step', 'limit_resistor', 'input_current']
+        required_keys = ['start_voltage', 'end_voltage', 'step', 'limit_resistor', 'input_current', 'maximum_current']
         for key in required_keys:
             if key not in config:
                 return f"ERROR: {key} is missing in the config file."
@@ -49,9 +52,23 @@ def check_config(config):
             return "ERROR: End voltage is not a number."
         if not isinstance(config.get('step'), (int, float)):
             return "ERROR: Step is not a number."
-        if not isinstance(config.get('input_current'), (int, float)):
-            return "ERROR: Input current is not a number."
 
+    #check if input current is a number above 0
+    if not isinstance(config.get('input_current'), (int, float)):
+        return "ERROR: Input current is not a number."
+    elif config.get('input_current') < 0:
+        print("WARNING: Input current is negative. Setting it to 0.")
+        config['input_current'] = 0
+        
+    #check if maximum current is a number above 0
+    if not isinstance(config.get('maximum_current'), (int, float)):
+        return "ERROR: Maximum current is not a number."
+    else:
+        if config.get('maximum_current') < 0:
+            print("WARNING: Maximum current is negative. The measurement will not be aborted the current limit.")
+            config['maximum_current'] = 0
+
+    #check if limit resistor is valid
     if config.get('limit_resistor') not in ['short', '12M', '120M', '1.2G', '12G', '120G']:
         return "ERROR: Limit resistor is invalid. It should be 'short', '12M', '120M', '1.2G', '12G' or '120G'."
             
@@ -73,5 +90,4 @@ def check_config(config):
         if type(config.get('save_folder')) != str:
             return "ERROR: Save folder is not a string."
         
-    return True
-            
+    return True           

@@ -2,14 +2,18 @@
 from externalDeviceControl import *
 from dataAnalysis import *
 from saveData import *
-import time
+from time import sleep
 
-def initialize_hardware(maximum_current, limit_resistor):
+def initialize_hardware(config):
+    #get parameters from input dict
+    input_current = config.get('input_current')
+    limit_resistor = config.get('limit_resistor')
+    
     if not fug_clear():
         exit('ERROR: Fug could not be reset')
 
     #initialize the HV source
-    if not fug_set_current(maximum_current):
+    if not fug_set_current(input_current):
         exit('ERROR: Fug could not set current')
 
     if not fug_enable_output(True):
@@ -50,26 +54,13 @@ def voltage_sweep(start_voltage, end_voltage, step):
 #function to go through each temperature
 #config needs to be a dict with these keys: mode, limit_resistor AND EITHER voltage OR start_voltage, end_voltage, step
 def temperature_sweep(config):
-    #check for validity of config dict
-    if 'mode' not in config:
-        print('ERROR: No mode selected')
-        return False
-    
     mode = config.get('mode')
-    if mode != 'voltage' and mode != 'voltage_sweep':
-        print('ERROR: Invalid mode selected')
-        return False
-
-    #extract information for all modes
     temperature_list = config.get('temperature_list')
     temperature_tolerance = config.get('temperature_tolerance')
     limit_resistor = config.get('limit_resistor')
-
-    if 'file_path' in config:
-        file_path = config.get('file_path')
-        save_to_file = True
-    else:
-        save_to_file = False
+    maximum_current = config.get('maximum_current')
+    save_to_file = config.get('save_to_file')
+    file_path = config.get('file_path')
 
     #go through each temperature
     for set_temperature in temperature_list:
@@ -81,7 +72,7 @@ def temperature_sweep(config):
         #wait for temperature to be reached
         while not set_temperature_reached(set_temperature, temperature_tolerance):
             print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(measure_temperature(), 3)}')
-            time.sleep(30)
+            sleep(30)
         print(f'INFO: Temperature reached: {round(measure_temperature(), 3)}')
 
         #start the corresponding measurement
@@ -97,6 +88,8 @@ def temperature_sweep(config):
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
+            if current >= maximum_current and maximum_current != 0:
+                print('INFO: Current limit exceeded')
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -111,31 +104,21 @@ def temperature_sweep(config):
 
                 #make a line to save to csv
                 csv_line = [set_temperature, actual_temperature, dut_voltage, current]
-                if save_to_file:
+                if save_to_file == True:
                     append_to_csv(file_path, csv_line)
+                if current >= maximum_current and maximum_current != 0:
+                    print('INFO: Current limit exceeded')
+                    break
 
     return True
 
 #function to do everything without temperature
 #config needs to be a dict with these keys: mode, limit_resistor AND EITHER voltage OR start_voltage, end_voltage, step
-def no_temperature(config):
-    #check for validity of config dict
-    if 'mode' not in config:
-        print('ERROR: No mode selected')
-        return False
-    
-    mode = config.get('mode')
-    if mode != 'voltage' and mode != 'voltage_sweep':
-        print('ERROR: Invalid mode selected')
-        return False
-    
-    #extract information for all modes
+def no_temperature(config):    
+    mode = config.get('mode')    
     limit_resistor=config.get('limit_resistor')
-    if 'file_path' in config:
-        file_path = config.get('file_path')
-        save_to_file = True
-    else:
-        save_to_file = False
+    save_to_file = config.get('save_to_file')
+    file_path = config.get('file_path')
 
     #start the corresponding measurement
     if mode == 'voltage':

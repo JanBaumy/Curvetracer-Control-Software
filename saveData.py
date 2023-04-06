@@ -6,7 +6,7 @@ import csv
 def check_and_create_file(file, has_temperature):
     if not os.path.exists(file):
         open(file, 'w').close()
-        if has_temperature:
+        if has_temperature == True:
             header = ['Set Temperature', 'Actual Temperature', 'Voltage', 'Current']
         else:
             header = ['Voltage', 'Current']
@@ -19,4 +19,6 @@ def append_to_csv(file, data):
     with open(file, 'a', newline='') as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(data)
+
+    return True
 
