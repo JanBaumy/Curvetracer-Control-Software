@@ -4,7 +4,7 @@ huber_pilot_one_port = 8101
 fug_host = "192.168.0.42"
 fug_port = 4242
 rio_host = "192.168.1.8/RIO0"
-rio_bitfile = 'InFpga.lvbitx'
+rio_bitfile = 'FPGA Bitfile/InFpga.lvbitx'
 
 import socket
 from nifpga import Session
