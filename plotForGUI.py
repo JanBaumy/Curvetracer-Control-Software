@@ -97,6 +97,9 @@ def init_plot(config):
     axs[1].set_xlabel('Voltage [V]')
     axs[1].set_ylabel('Current [A]')
 
+    for ax in axs:
+        ax.grid(color='white', linestyle='-', linewidth=0.2)
+
     fig.suptitle('Real-Time Data')
     fig.set_figheight(6)
     fig.set_figwidth(10)

@@ -1,8 +1,9 @@
 #higher level functions implementing all different modes
+from time import sleep
 from externalDeviceControl import *
 from dataAnalysis import *
 from saveData import *
-from time import sleep
+
 
 def initialize_hardware(config):
     #get parameters from input dict
