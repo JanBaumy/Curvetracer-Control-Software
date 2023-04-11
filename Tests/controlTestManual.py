@@ -1,11 +1,11 @@
 #debug function to test the workflow
 from sys import path
-path.append('../Curvetracer Control Software')
+path.append('../Curvetracer-Control-Software')
 
 from externalDeviceControl import *
 from dataAnalysis import *
 from saveData import *
-import time
+from time import sleep
 
 def main():
 
@@ -13,10 +13,10 @@ def main():
     create_file = False
     file_path = "manual_test.csv"
 
-    input_voltage = 20
+    input_voltage = 500
     input_current = 5e-3
 
-    has_temperature = True
+    has_temperature = False
     input_temperature = 35
 
     limit_resistor = 'short'
@@ -30,7 +30,7 @@ def main():
     if not fug_set_current(input_current):
         exit('ERROR: Fug could not set current')
 
-    if not fug_enable_output(True):
+    if not fug_enable_output(1):
         exit('ERROR: Fug could not enable output')
 
     #initialize the RIO unit
@@ -38,16 +38,16 @@ def main():
 
     #set limit resistor and enable power
     set_limit_resistor(resistor=limit_resistor)
-    enable_power_FPGA()
+    enable_power_FPGA(True)
 
     #initialize the Huber Pilot One temperature unit
     if not huber_set_temperature(set_temperature=input_temperature):
         exit('ERROR: Huber Pilot One temperature could not be set')
 
     #wait for temperature to be reached
-    while not set_temperature_reached(set_temperature=input_temperature, tolerance=2):
-        print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(measure_temperature(), 3)}')
-        time.sleep(30)
+    # while not set_temperature_reached(set_temperature=input_temperature, tolerance=2):
+    #     print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(measure_temperature(), 3)}')
+    #     time.sleep(30)
 
     if has_temperature == True:
         measured_temperature = measure_temperature()
@@ -58,6 +58,7 @@ def main():
 
     #wait for a valid output, then read it
     while not valid_current():
+        print('waiting for valid current')
         pass
     
     measured_current = measure_current()

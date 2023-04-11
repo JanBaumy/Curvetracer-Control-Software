@@ -1,5 +1,5 @@
 from sys import path
-path.append('../Curvetracer Control Software')
+path.append('../Curvetracer-Control-Software')
 from modes import temperature_sweep, initialize_hardware
 from saveData import check_and_create_file
 

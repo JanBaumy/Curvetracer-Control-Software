@@ -6,9 +6,10 @@ from matplotlib.animation import FuncAnimation
 import os
 import ctypes
 from sys import path
-path.append('../Curvetracer Control Software')
+path.append('../Curvetracer-Control-Software')
 from plotForGUI import *
 from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
+from modes import temperature_sweep, no_temperature, initialize_hardware
 from configLoader import *
 from saveData import check_and_create_file
 
@@ -90,6 +91,7 @@ class GUI:
     #starts the measurement
     def start_measurement(self):
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
+        initialize_hardware(self.config)
 
         self.measurement_thread = MeasurementThread(self)
         self.measurement_thread.start()
@@ -124,9 +126,9 @@ class MeasurementThread(threading.Thread):
     def run(self):
         while not self._stop_event.is_set():
             if self.gui.config.get('has_temperature') == True:
-                fake_temperature_sweep(self.gui.config)
+                temperature_sweep(self.gui.config)
             else:
-                fake_no_temperature(self.gui.config)
+                no_temperature(self.gui.config)
 
     def get_id(self): 
         # returns id of the respective thread

@@ -17,7 +17,7 @@ def initialize_hardware(config):
     if not fug_set_current(input_current):
         exit('ERROR: Fug could not set current')
 
-    if not fug_enable_output(True):
+    if not fug_enable_output(1):
         exit('ERROR: Fug could not enable output')
 
     #initialize the RIO unit
@@ -25,7 +25,7 @@ def initialize_hardware(config):
 
     #set limit resistor and enable power
     set_limit_resistor(resistor=limit_resistor)
-    enable_power_FPGA()
+    enable_power_FPGA(True)
 
 #function to apply a single voltage and return the current
 def single_voltage(voltage):
