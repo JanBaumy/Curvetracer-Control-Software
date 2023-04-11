@@ -17,7 +17,7 @@ def initialize_hardware(config):
     if not fug_set_current(input_current):
         exit('ERROR: Fug could not set current')
 
-    if not fug_enable_output(1):
+    if not fug_enable_output(True):
         exit('ERROR: Fug could not enable output')
 
     #initialize the RIO unit
@@ -42,13 +42,7 @@ def single_voltage(voltage):
 def voltage_sweep(start_voltage, end_voltage, step):
     #end voltage may never be exceeded
     while (start_voltage + step) <= end_voltage:
-        fug_set_voltage(start_voltage)
-
-        #wait for valid current measurement
-        while not valid_current():
-            pass
-
-        current = measure_current()
+        current = single_voltage(start_voltage)
         start_voltage += step
         yield start_voltage, current
 
