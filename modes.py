@@ -85,6 +85,8 @@ def temperature_sweep(config):
                 append_to_csv(file_path, csv_line)
             if current >= maximum_current and maximum_current != 0:
                 print('INFO: Current limit exceeded')
+                fug_set_voltage(0)
+                sleep(3) #wait for FPGA to read current
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -103,6 +105,8 @@ def temperature_sweep(config):
                     append_to_csv(file_path, csv_line)
                 if current >= maximum_current and maximum_current != 0:
                     print('INFO: Current limit exceeded')
+                    fug_set_voltage(0)
+                    sleep(3) #wait for FPGA to read current
                     break
 
     return True
