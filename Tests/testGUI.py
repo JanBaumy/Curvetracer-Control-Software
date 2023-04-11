@@ -91,7 +91,7 @@ class GUI:
     #starts the measurement
     def start_measurement(self):
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
-        initialize_hardware(self.config)
+        #initialize_hardware(self.config)
 
         self.measurement_thread = MeasurementThread(self)
         self.measurement_thread.start()
@@ -124,11 +124,11 @@ class MeasurementThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        while not self._stop_event.is_set():
-            if self.gui.config.get('has_temperature') == True:
-                temperature_sweep(self.gui.config)
-            else:
-                no_temperature(self.gui.config)
+        if self.gui.config.get('has_temperature') == True:
+            fake_temperature_sweep(self.gui.config)
+        else:
+            fake_no_temperature(self.gui.config)
+        print("INFO: Measurement has finished!")
 
     def get_id(self): 
         # returns id of the respective thread
@@ -144,7 +144,7 @@ class MeasurementThread(threading.Thread):
               ctypes.py_object(SystemExit))
         if res > 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
-            print('Exception raise failure')
+            print('ERROR: Exception raise failure')
 
 if __name__ == "__main__":
     gui = GUI()
