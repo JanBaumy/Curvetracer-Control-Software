@@ -82,10 +82,8 @@ def fug_set_current(current):
     return False
 
 #function to enable/disable the output of the Fug HV source
-def fug_enable_output(mode):
-    #1 = enable; 0 = disable; undefined also disable
-    if mode != 1 or 0:
-        mode = 0
+def fug_enable_output(mode: bool):
+    mode = 1 if mode == True else 0
 
     payload = 'F' + str(mode) +'\r\n'
     return_value = tcp_send_receive(fug_host, fug_port, payload)
