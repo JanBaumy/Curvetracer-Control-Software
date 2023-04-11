@@ -1,9 +1,9 @@
 #basic functions to control all external hardware devices
-huber_pilot_one_host = "192.168.0.90"
+huber_pilot_one_host = "192.168.1.90"
 huber_pilot_one_port = 8101
-fug_host = "192.168.0.42"
+fug_host = "192.168.1.42"
 fug_port = 4242
-rio_host = "192.168.1.8/RIO0"
+rio_host = 'rio://192.168.1.8/RIO0'
 rio_bitfile = 'FPGA Bitfile/InFpga.lvbitx'
 
 import socket
@@ -36,13 +36,13 @@ def huber_set_temperature(set_temperature):
 
     #convert to hex signed 2's complement and make it four characters
     set_temperature_hex = format(set_temperature & (2**16-1), 'x')
-    set_temperature_hex = set_temperature_hex.zfill(4)
+    set_temperature_hex = set_temperature_hex.zfill(4).upper()
 
     #convert to Huber Pilot One format and send
-    payload = r'{M00' + set_temperature_hex
+    payload = r'{M00' + set_temperature_hex + '\r\n'
     return_value = tcp_send_receive(huber_pilot_one_host, huber_pilot_one_port, payload)
 
-    exspected_return = 'SB00' + set_temperature_hex
+    exspected_return = r'{S00' + set_temperature_hex + '\r\n'
 
     if return_value == exspected_return:
         return True
@@ -56,11 +56,11 @@ def fug_set_voltage(voltage):
         voltage = 0
 
     #convert to Fug's exspected format
-    payload = 'U' + str(voltage)
+    payload = 'U' + str(voltage) + '\r\n'
     return_value = tcp_send_receive(fug_host, fug_port, payload)
 
     #check for valid return
-    if return_value == 'E0':
+    if return_value == 'E0\n':
         return True
     
     return False
@@ -70,11 +70,11 @@ def fug_set_current(current):
     if current < 0:
         current = 0
 
-    payload = 'I' + str(current)
+    payload = 'I' + str(current) + '\r\n'
     return_value = tcp_send_receive(fug_host, fug_port, payload)
 
     #check for valid return
-    if return_value == 'E0':
+    if return_value == 'E0\n':
         return True
 
     print(payload)
@@ -87,21 +87,21 @@ def fug_enable_output(mode):
     if mode != 1 or 0:
         mode = 0
 
-    payload = 'F' + str(mode)
+    payload = 'F' + str(mode) +'\r\n'
     return_value = tcp_send_receive(fug_host, fug_port, payload)
 
     #check for valid return    
-    if return_value == 'E0':
+    if return_value == 'E0\n':
         return True
     
     return False
 
 #function to return the Fug HV source to default values
 def fug_clear():
-    return_value = tcp_send_receive(fug_host, fug_port, '=')
+    return_value = tcp_send_receive(fug_host, fug_port, '=\r\n')
 
     #check for valid return    
-    if return_value == 'E0':
+    if return_value == 'E0\n':
         return True
     
     return False
@@ -109,9 +109,9 @@ def fug_clear():
 #function to read the set voltage/current of the Fug HV source
 def fug_read(parameter):
     if parameter == 'voltage':
-        payload = '>M0?'
+        payload = '>M0?\r\n'
     elif parameter == 'current':
-        payload = '>M1?'
+        payload = '>M1?\r\n'
     else:
         return False
 
@@ -183,7 +183,8 @@ def measure_current():
 #function to measure temperature
 def measure_temperature():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
-        pt100_value = session.registers['Mod3/RTD0']
+        pt100 = session.registers['Mod3/RTD0']
+        pt100_value = float(pt100.read())
 
     if (pt100_value == 100):
        temperature = 20
