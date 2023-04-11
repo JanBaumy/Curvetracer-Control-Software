@@ -46,7 +46,7 @@ def extract_data(data, has_temperature):
     if has_temperature:
         return ((range(len(voltage)), voltage), (voltage, current), (range(len(temperature)), temperature))
     else:
-        return (range(len(voltage)), (voltage, current))
+        return ((range(len(voltage)), voltage), (voltage, current))
         
 #update function needs the axs object and data in the format (voltage, current (,temperature))
 def update(i, axs, previous_lines, config):
