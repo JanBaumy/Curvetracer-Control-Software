@@ -15,9 +15,11 @@ from saveData import check_and_create_file
 
 #test gui class
 class GUI:
-    fig, axs, canvas, animation_thread, measurement_thread = None, None, None, None, None
+    fig, axs, canvas, config, animation_thread, measurement_thread = [None] * 6
     animation = None #this needs to keep a reference to the animation object, otherwise it will be garbage collected
     previous_data = 1 #previous lines in data file
+
+    file_path = None
 
     def __init__(self):
         self.root = tk.Tk()
@@ -36,15 +38,22 @@ class GUI:
     def create_widgets(self):
         # Choose config file button
         choose_config_file_button = tk.Button(self.root, text="Choose Config File", command=self.choose_config_file)
-        choose_config_file_button.grid(row=1, column=0)
+        choose_config_file_button.grid(row=2, column=0)
+
+        # File name input
+        self.file_path = tk.StringVar()
+        file_name_label = tk.Label(self.root, text="File Name")
+        file_name_label.grid(row=1, column=1)
+        file_path_entry = tk.Entry(self.root, textvariable=self.file_path)
+        file_path_entry.grid(row=2, column=1)
 
         # Start measurement button
         start_measurement_button = tk.Button(self.root, text="Start Measurement", command=self.start_measurement)
-        start_measurement_button.grid(row=1, column=1)
+        start_measurement_button.grid(row=2, column=2)
 
         # Stop measurement button
         stop_measurement_button = tk.Button(self.root, text="EMERGENCY Stop", command=self.stop_measurement)
-        stop_measurement_button.grid(row=1, column=2)
+        stop_measurement_button.grid(row=2, column=3)
 
     #draws the static plot
     def create_canvas(self):
@@ -54,7 +63,7 @@ class GUI:
         #put the plot into the GUI
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas.draw()
-        self.canvas.get_tk_widget().grid(row=0, column=0, columnspan=3)
+        self.canvas.get_tk_widget().grid(row=0, column=0, columnspan=4)
         self.start_animation_thread()
 
     #redraws the plot after config change
@@ -73,15 +82,20 @@ class GUI:
 
         valid_config = check_config(self.config)
         if valid_config != True:
-            print(valid_config)
+            print(valid_config) #return is the error message
             return
 
+        #if there is already data in the file, check if user wants to plot it again
         if os.path.exists(self.config.get('file_path')) and not self.config.get('plot_previous_data'):
             self.previous_data = sum(1 for line in open(self.config.get('file_path')))
         else:
             self.previous_data = 1
 
         self.redraw_canvas()
+
+    #edits the config with the input values
+    def edit_config(self):
+        self.config['file_path'] = self.config['save_folder'] + self.file_path.get()
 
     #starts the animation
     def start_animation_thread(self):
@@ -91,7 +105,8 @@ class GUI:
     #starts the measurement
     def start_measurement(self):
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
-        #initialize_hardware(self.config)
+        self.edit_config() #update the config with the input values
+        initialize_hardware(self.config)
 
         self.measurement_thread = MeasurementThread(self)
         self.measurement_thread.start()
@@ -125,9 +140,9 @@ class MeasurementThread(threading.Thread):
 
     def run(self):
         if self.gui.config.get('has_temperature') == True:
-            fake_temperature_sweep(self.gui.config)
+            temperature_sweep(self.gui.config)
         else:
-            fake_no_temperature(self.gui.config)
+            no_temperature(self.gui.config)
         print("INFO: Measurement has finished!")
 
     def get_id(self): 

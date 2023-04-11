@@ -1,6 +1,6 @@
 #CLI test for resistor
 from sys import path
-path.append('../Curvetracer Control Software')
+path.append('../Curvetracer-Control-Software')
 from configLoader import import_config, check_config
 from saveData import check_and_create_file
 from modes import no_temperature, temperature_sweep
