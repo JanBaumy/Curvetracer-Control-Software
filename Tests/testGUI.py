@@ -8,10 +8,11 @@ import os
 import ctypes
 from sys import path
 path.append('../Curvetracer-Control-Software')
-from plotForGUI import *
-from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
-from modes import temperature_sweep, no_temperature, initialize_hardware
 from configLoader import *
+from plotForGUI import *
+#from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
+from externalDeviceControl import fug_clear
+from modes import temperature_sweep, no_temperature, initialize_hardware
 from saveData import check_and_create_file
 
 #test gui class
@@ -28,20 +29,32 @@ class GUI:
         #create an initial config
         self.config = {'has_temperature:': True, 'file_path': 'null_measurement.csv'}
 
+    #startup function
+    def run(self):
+        #make the program stop upon closing the window
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
         #cultivate the GUI
         self.create_canvas()
         self.create_widgets()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
-    def run(self):
         self.root.mainloop()   
 
+    #stop function
     def on_closing(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if messagebox.askokcancel("Quit", "Do you want to quit?\n\nWARNING: If the measurement is still running, you may need to physically restart the hardware devices afterwards."):
             self.stop_measurement()
             self.animation_thread.stop()
+
+            try:
+                if not fug_clear():
+                    messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
+            except:
+                messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
+
+            #destroy window and stop session
             self.root.destroy()
+            self.root.quit()
 
     #populates the GUI with widgets
     def create_widgets(self):
@@ -117,13 +130,20 @@ class GUI:
         self.edit_config() #update the config with the input values
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
 
-        #self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
-        #self.measurement_thread.start()
+        self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
+        self.measurement_thread.start()
 
     #emergency stop incase of physical damage
     def stop_measurement(self):
         if self.measurement_thread != None:
             self.measurement_thread.raise_exception()
+
+            try:
+                if not fug_clear():
+                    messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
+            except:
+                messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
+
             self.animation_thread.join()
 
 #class to run the animation in a separate thread
@@ -138,6 +158,7 @@ class AnimationThread(threading.Thread):
     def stop(self):
         self.gui.animation._stop()
         self.gui.animation = None
+        del self.gui.animation
         self.join()
 
 #class to run the measurement in a separate thread
