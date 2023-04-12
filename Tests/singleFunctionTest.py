@@ -9,6 +9,8 @@ def main():
     # print('INFO: Starting HUBER test')
     # if not huber_set_temperature(20):
     #     print('ERROR: Failed to set temperature to 20')
+    if not huber_process_temperature(20):
+        print('ERROR: Failed to set process temperature')
     # if not huber_set_temperature(0):
     #     print('ERROR: Failed to set temperature to 0')
     # if not huber_set_temperature(-50):
@@ -37,7 +39,7 @@ def main():
     # enable_power_FPGA(True)
     # set_limit_resistor('12M')
     # print(f'Valid current: {valid_current()}')
-     print(f'Current is: {measure_current()}')
+    # print(f'Current is: {measure_current()}')
     # print(f'Temperature is: {measure_temperature()}')
 
     # return

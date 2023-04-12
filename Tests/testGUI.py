@@ -104,8 +104,8 @@ class GUI:
 
     #starts the measurement
     def start_measurement(self):
-        check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
         self.edit_config() #update the config with the input values
+        check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
         initialize_hardware(self.config)
 
         self.measurement_thread = MeasurementThread(self)
