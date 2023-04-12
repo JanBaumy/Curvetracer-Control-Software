@@ -49,6 +49,7 @@ def huber_set_temperature(set_temperature):
 
     return False
 
+#function to give the DUT temperature to the Huber Pilot One Temperature unit
 def huber_process_temperature(set_temperature):
 
     #multiply by 100 and convert to integer (because Huber Pilot One specification)
@@ -63,6 +64,20 @@ def huber_process_temperature(set_temperature):
     return_value = tcp_send_receive(huber_pilot_one_host, huber_pilot_one_port, payload)
 
     exspected_return = r'{S09' + set_temperature_hex + '\r\n'
+
+    if return_value == exspected_return:
+        return True
+
+    return False
+
+#function to enable process control on the Huber Pilot One Temperature unit
+def huber_enable_process_control(mode: bool):
+    mode = '01' if mode == True else '00'
+
+    payload = r'{M1900' + mode + '\r\n'
+    return_value = tcp_send_receive(huber_pilot_one_host, huber_pilot_one_port, payload)
+
+    exspected_return = r'{S1900' + mode + '\r\n'
 
     if return_value == exspected_return:
         return True
@@ -103,9 +118,9 @@ def fug_set_current(current):
 
 #function to enable/disable the output of the Fug HV source
 def fug_enable_output(mode: bool):
-    mode = 1 if mode == True else 0
+    mode = '1' if mode == True else '0'
 
-    payload = 'F' + str(mode) +'\r\n'
+    payload = 'F' + mode +'\r\n'
     return_value = tcp_send_receive(fug_host, fug_port, payload)
 
     #check for valid return    
