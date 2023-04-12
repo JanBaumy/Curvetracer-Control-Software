@@ -40,9 +40,14 @@ def single_voltage(voltage):
 
 #function to generate the voltage sweep (used as generator function)
 def voltage_sweep(start_voltage, end_voltage, step):
+    current, last_current = 0, 0
+
     #end voltage may never be exceeded
     while (start_voltage + step) <= end_voltage:
-        current = single_voltage(start_voltage)
+        #FPGA takes time to measure
+        while current == last_current:
+            current = single_voltage(start_voltage)
+        last_current = current
         start_voltage += step
         yield start_voltage, current
 
@@ -70,11 +75,13 @@ def temperature_sweep(config):
             sleep(5)
         print(f'INFO: Temperature reached: {round(measure_temperature(), 3)}')
 
+
         #start the corresponding measurement
         if mode == 'voltage':
             #get parameters from input dict
             voltage = config.get('voltage')
             
+            #measurement
             actual_temperature = round(measure_temperature(), 3)
             dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
             current = single_voltage(voltage)
@@ -83,15 +90,18 @@ def temperature_sweep(config):
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
+
+            #check if current exceeds limit
             if current >= maximum_current and maximum_current != 0:
                 print('INFO: Current limit exceeded')
                 fug_set_voltage(0)
-                sleep(3) #wait for FPGA to read current
-            csv_line = ["", "", "", ""]
+                sleep(3) #wait for FPGA to reset current
+
+            #save the data to file
             if save_to_file == True:
-                append_to_csv(file_path, csv_line)
+                append_to_csv(file_path, csv_line) #appends data line
                 csv_line = ["", "", "", ""]
-                append_to_csv(file_path, csv_line)
+                append_to_csv(file_path, csv_line) #appends empty line
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -108,14 +118,16 @@ def temperature_sweep(config):
                 csv_line = [set_temperature, actual_temperature, dut_voltage, current]
                 if save_to_file == True:
                     append_to_csv(file_path, csv_line)
+
+                #check if current exceeds limit
                 if current >= maximum_current and maximum_current != 0:
                     print('INFO: Current limit exceeded')
                     fug_set_voltage(0)
                     sleep(3) #wait for FPGA to read current
                     break
-
-            csv_line = ["", "", "", ""]
+  
             if save_to_file == True:
+                csv_line = ["", "", "", ""]
                 append_to_csv(file_path, csv_line)
 
     return True
@@ -139,9 +151,9 @@ def no_temperature(config):
         #make a line to save to csv
         csv_line = [dut_voltage, current]
         if save_to_file:
-            append_to_csv(file_path, csv_line)
+            append_to_csv(file_path, csv_line) #appends data line
             csv_line = ["", "", "", ""]
-            append_to_csv(file_path, csv_line)
+            append_to_csv(file_path, csv_line) #appends empty line
 
 
     elif mode == 'voltage_sweep':
@@ -159,8 +171,8 @@ def no_temperature(config):
             if save_to_file:
                 append_to_csv(file_path, csv_line)
 
-        csv_line = ["", "", "", ""]
         if save_to_file == True:
+            csv_line = ["", "", "", ""]
             append_to_csv(file_path, csv_line)
 
     return True
