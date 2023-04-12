@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.animation import FuncAnimation
@@ -24,15 +25,23 @@ class GUI:
     def __init__(self):
         self.root = tk.Tk()
 
-        #import null config
-        self.config = import_config(r'Basic Configs\null_config.json')
+        #create an initial config
+        self.config = {'has_temperature:': True, 'file_path': 'null_measurement.csv'}
 
         #cultivate the GUI
         self.create_canvas()
         self.create_widgets()
 
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
     def run(self):
         self.root.mainloop()   
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.stop_measurement()
+            self.animation_thread.stop()
+            self.root.destroy()
 
     #populates the GUI with widgets
     def create_widgets(self):
@@ -80,11 +89,6 @@ class GUI:
         config_file_path = filedialog.askopenfilename()
         self.config = import_config(config_file_path)
 
-        valid_config = check_config(self.config)
-        if valid_config != True:
-            print(valid_config) #return is the error message
-            return
-
         #if there is already data in the file, check if user wants to plot it again
         if os.path.exists(self.config.get('file_path')) and not self.config.get('plot_previous_data'):
             self.previous_data = sum(1 for line in open(self.config.get('file_path')))
@@ -95,7 +99,13 @@ class GUI:
 
     #edits the config with the input values
     def edit_config(self):
-        self.config['file_path'] = self.config['save_folder'] + self.file_path.get()
+        if not len(self.file_path.get()) == 0:
+            self.config['file_path'] = self.config['save_folder'] + '\\' + self.file_path.get()
+
+        valid_config = check_config(self.config)
+        if valid_config != True:
+            print(valid_config) #return is the error message
+            return
 
     #starts the animation
     def start_animation_thread(self):
@@ -106,10 +116,9 @@ class GUI:
     def start_measurement(self):
         self.edit_config() #update the config with the input values
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
-        initialize_hardware(self.config)
 
-        self.measurement_thread = MeasurementThread(self)
-        self.measurement_thread.start()
+        #self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
+        #self.measurement_thread.start()
 
     #emergency stop incase of physical damage
     def stop_measurement(self):
@@ -139,6 +148,8 @@ class MeasurementThread(threading.Thread):
         self.gui = gui
 
     def run(self):
+        initialize_hardware(self.config)
+
         if self.gui.config.get('has_temperature') == True:
             temperature_sweep(self.gui.config)
         else:
