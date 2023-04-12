@@ -67,7 +67,7 @@ def temperature_sweep(config):
         #wait for temperature to be reached
         while not set_temperature_reached(set_temperature, temperature_tolerance):
             print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(measure_temperature(), 3)}')
-            sleep(30)
+            sleep(5)
         print(f'INFO: Temperature reached: {round(measure_temperature(), 3)}')
 
         #start the corresponding measurement
@@ -87,6 +87,11 @@ def temperature_sweep(config):
                 print('INFO: Current limit exceeded')
                 fug_set_voltage(0)
                 sleep(3) #wait for FPGA to read current
+            csv_line = ["", "", "", ""]
+            if save_to_file == True:
+                append_to_csv(file_path, csv_line)
+                csv_line = ["", "", "", ""]
+                append_to_csv(file_path, csv_line)
 
         elif mode == 'voltage_sweep':
             #get parameters from input dict
@@ -108,6 +113,10 @@ def temperature_sweep(config):
                     fug_set_voltage(0)
                     sleep(3) #wait for FPGA to read current
                     break
+
+            csv_line = ["", "", "", ""]
+            if save_to_file == True:
+                append_to_csv(file_path, csv_line)
 
     return True
 
@@ -131,6 +140,9 @@ def no_temperature(config):
         csv_line = [dut_voltage, current]
         if save_to_file:
             append_to_csv(file_path, csv_line)
+            csv_line = ["", "", "", ""]
+            append_to_csv(file_path, csv_line)
+
 
     elif mode == 'voltage_sweep':
         #get parameters from input dict
@@ -146,6 +158,10 @@ def no_temperature(config):
             csv_line = [dut_voltage, current]
             if save_to_file:
                 append_to_csv(file_path, csv_line)
+
+        csv_line = ["", "", "", ""]
+        if save_to_file == True:
+            append_to_csv(file_path, csv_line)
 
     return True
 
