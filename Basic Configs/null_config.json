@@ -10,6 +10,6 @@
     "end_voltage": 0,
     "step": 0,
     "save_to_file": false,
-    "save_folder": "C:\\Users\\Jan\\Desktop\\SHA-Curvetracer Measurements",
+    "save_folder": "",
     "file_path": "null_measurement.csv"
 }

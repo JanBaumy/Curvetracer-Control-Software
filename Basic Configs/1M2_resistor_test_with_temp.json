@@ -1,6 +1,6 @@
 {
     "has_temperature": true,
-    "temperature_list": [20, 30, -20, 80],
+    "temperature_list": [20, 80],
     "temperature_tolerance": 2,
     "mode": "voltage_sweep",
     "limit_resistor": "short",
@@ -10,7 +10,7 @@
     "end_voltage": 1000,
     "step": 100,
     "save_to_file": true,
-    "save_folder": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\",
-    "file_path": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer Control Software\\TEST.csv",
-    "plot_previous_data": true
+    "save_folder": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer-Control-Software\\",
+    "file_path": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer-Control-Software\\TEST.csv",
+    "plot_previous_data": false
 }

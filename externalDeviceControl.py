@@ -204,12 +204,8 @@ def measure_temperature():
         pt100 = session.registers['Mod3/RTD0']
         pt100_value = float(pt100.read())
 
-    if (pt100_value == 100):
-       temperature = 0
+        #convert PT100 value to temperature with parameters gained from quadratic regression
+        temperature = 0.00105938*(pt100_value**2) + 2.3448*pt100_value - 245.092
 
-    elif (pt100_value < 100):
-       temperature = 0.0015*(pt100_value**2) + 2.2833*pt100_value - 242.94
-    else:
-       temperature = 0.0014*(pt100_value**2) + 2.2074*pt100_value - 233.54
 
     return temperature
