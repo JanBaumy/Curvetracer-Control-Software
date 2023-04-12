@@ -49,6 +49,26 @@ def huber_set_temperature(set_temperature):
 
     return False
 
+def huber_process_temperature(set_temperature):
+
+    #multiply by 100 and convert to integer (because Huber Pilot One specification)
+    set_temperature = int(100*set_temperature)
+
+    #convert to hex signed 2's complement and make it four characters
+    set_temperature_hex = format(set_temperature & (2**16-1), 'x')
+    set_temperature_hex = set_temperature_hex.zfill(4).upper()
+
+    #convert to Huber Pilot One format and send
+    payload = r'{M09' + set_temperature_hex + '\r\n'
+    return_value = tcp_send_receive(huber_pilot_one_host, huber_pilot_one_port, payload)
+
+    exspected_return = r'{S09' + set_temperature_hex + '\r\n'
+
+    if return_value == exspected_return:
+        return True
+
+    return False
+
 #-----FUG DEVICE----- ----------------------------------------------------------------------
 #function to set the voltage of the Fug HV source
 def fug_set_voltage(voltage):
@@ -185,11 +205,11 @@ def measure_temperature():
         pt100_value = float(pt100.read())
 
     if (pt100_value == 100):
-       temperature = 20
+       temperature = 0
 
     elif (pt100_value < 100):
-       temperature = 0.0014*(pt100_value**2) + 2.2884*pt100_value - 239
+       temperature = 0.0015*(pt100_value**2) + 2.2833*pt100_value - 242.94
     else:
-       temperature = 0.0012*(pt100_value**2) + 2.296*pt100_value - 244
+       temperature = 0.0014*(pt100_value**2) + 2.2074*pt100_value - 233.54
 
     return temperature
