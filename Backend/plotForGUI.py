@@ -10,7 +10,6 @@ def get_raw_data(file_path, previous_lines):
         data = np.genfromtxt(file_path, delimiter=';', skip_header=previous_lines)
         return data
     else:
-        print("WARNING: No data file found")
         return np.empty(shape=(0,0))
     
 #extract data from file (returns 3 lists when has_temperature is True, 2 lists when has_temperature is False)
@@ -96,13 +95,14 @@ def init_plot(config):
     axs[1].set_title('Current vs Voltage')
     axs[1].set_xlabel('Voltage [V]')
     axs[1].set_ylabel('Current [A]')
+    axs[1].set_yscale('log')
 
     for ax in axs:
         ax.grid(color='white', linestyle='-', linewidth=0.2)
 
     fig.suptitle('Real-Time Data')
-    fig.set_figheight(6)
-    fig.set_figwidth(10)
+    #fig.set_figheight(6)
+    #fig.set_figwidth(10)
     fig.tight_layout(pad=1.0)
 
     return fig, axs
