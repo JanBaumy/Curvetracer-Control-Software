@@ -2,9 +2,9 @@
 from sys import path
 path.append('../Curvetracer-Control-Software')
 
-from externalDeviceControl import *
-from dataAnalysis import *
-from saveData import *
+from Backend.externalDeviceControl import *
+from Backend.dataAnalysis import *
+from Backend.saveData import *
 from time import sleep
 
 def main():

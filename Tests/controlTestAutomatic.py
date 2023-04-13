@@ -1,7 +1,7 @@
 from sys import path
 path.append('../Curvetracer-Control-Software')
-from modes import temperature_sweep, initialize_hardware
-from saveData import check_and_create_file
+from Backend.modes import temperature_sweep, initialize_hardware
+from Backend.saveData import check_and_create_file
 
 def main():
     temperature_list = [20, 25, 30, 35]

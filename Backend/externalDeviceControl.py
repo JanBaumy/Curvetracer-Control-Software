@@ -13,7 +13,7 @@ from nifpga import Session
 def tcp_send_receive(host, port, payload):
     #create socket and connect
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)
+    sock.settimeout(2)
     sock.connect((host, port))
     sock.settimeout(None)
 

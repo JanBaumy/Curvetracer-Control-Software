@@ -1,8 +1,8 @@
 #higher level functions implementing all different modes
 from time import sleep
-from externalDeviceControl import *
-from dataAnalysis import *
-from saveData import *
+from Backend.externalDeviceControl import *
+from Backend.dataAnalysis import *
+from Backend.saveData import *
 
 
 def initialize_hardware(config):
@@ -47,6 +47,7 @@ def voltage_sweep(start_voltage, end_voltage, step):
         #FPGA takes time to measure
         while current == last_current:
             current = single_voltage(start_voltage)
+            sleep(0.2)
         last_current = current
         start_voltage += step
         yield start_voltage, current

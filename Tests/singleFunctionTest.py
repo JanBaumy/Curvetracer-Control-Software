@@ -1,7 +1,7 @@
 #to test all external device functions independently
 from sys import path
 path.append('../Curvetracer-Control-Software')
-from externalDeviceControl import *
+from Backend.externalDeviceControl import *
 
 #write a main function to test the functions
 def main():

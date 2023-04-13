@@ -8,12 +8,12 @@ import os
 import ctypes
 from sys import path
 path.append('../Curvetracer-Control-Software')
-from configLoader import *
-from plotForGUI import *
+from Backend.configLoader import *
+from Backend.plotForGUI import *
 #from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
-from externalDeviceControl import fug_clear
-from modes import temperature_sweep, no_temperature, initialize_hardware
-from saveData import check_and_create_file
+from Backend.externalDeviceControl import fug_clear
+from Backend.modes import temperature_sweep, no_temperature, initialize_hardware
+from Backend.saveData import check_and_create_file
 
 #test gui class
 class GUI:
@@ -130,8 +130,8 @@ class GUI:
         self.edit_config() #update the config with the input values
         check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
 
-        self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
-        self.measurement_thread.start()
+        #self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
+        #self.measurement_thread.start()
 
     #emergency stop incase of physical damage
     def stop_measurement(self):
@@ -158,7 +158,6 @@ class AnimationThread(threading.Thread):
     def stop(self):
         self.gui.animation._stop()
         self.gui.animation = None
-        del self.gui.animation
         self.join()
 
 #class to run the measurement in a separate thread

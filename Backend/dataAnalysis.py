@@ -1,5 +1,5 @@
 #functions to analyze incoming data and return necessary outputs to advance program executionmeasure_temperature'
-from externalDeviceControl import measure_temperature
+from Backend.externalDeviceControl import measure_temperature
 
 #function to calculate the voltage across the DUT
 def calculateDUTVoltage(set_voltage, measured_current, limit_resistor):
