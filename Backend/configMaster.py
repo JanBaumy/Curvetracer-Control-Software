@@ -24,7 +24,7 @@ no_temp_sweep_voltage = dict(has_temperature=False,\
                                 step=50,\
                                 save_to_file=True,\
                                 save_folder=measurement_folder,\
-                                    plot_previous_data=False)
+                                plot_previous_data=False)
 
 temp_single_voltage = dict(has_temperature=True,\
                                 mode='voltage',\
@@ -35,7 +35,7 @@ temp_single_voltage = dict(has_temperature=True,\
                                 temperature_tolerance=2,\
                                 save_to_file=True,\
                                 save_folder=measurement_folder,\
-                                    plot_previous_data=False)
+                                plot_previous_data=False)
 
 temp_sweep_voltage = dict(has_temperature=True,\
                                 mode='voltage_sweep',\
@@ -49,7 +49,7 @@ temp_sweep_voltage = dict(has_temperature=True,\
                                 step=50,\
                                 save_to_file=True,\
                                 save_folder=measurement_folder,\
-                                    plot_previous_data=False)
+                                plot_previous_data=False)
 
 null_config = dict(has_temperature=True,\
                     mode='voltage_sweep',\
@@ -64,7 +64,7 @@ null_config = dict(has_temperature=True,\
                     save_to_file=False,\
                     save_folder=measurement_folder,
                     file_path='null_measurement.csv',\
-                        plot_previous_data=False)
+                    plot_previous_data=False)
 
 #export the configs
 print('Regenerating basic configs')
