@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
+import customtkinter as ctk
 import threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.animation import FuncAnimation
@@ -24,7 +25,7 @@ class GUI:
     file_path = None
 
     def __init__(self):
-        self.root = tk.Tk()
+        self.root = ctk.CTk()
 
         #create an initial config
         self.config = {'has_temperature:': True, 'file_path': 'null_measurement.csv'}
@@ -59,22 +60,22 @@ class GUI:
     #populates the GUI with widgets
     def create_widgets(self):
         # Choose config file button
-        choose_config_file_button = tk.Button(self.root, text="Choose Config File", command=self.choose_config_file)
+        choose_config_file_button = ctk.CTkButton(self.root, text="Choose Config File", command=self.choose_config_file)
         choose_config_file_button.grid(row=2, column=0)
 
         # File name input
         self.file_path = tk.StringVar()
-        file_name_label = tk.Label(self.root, text="File Name")
+        file_name_label = ctk.CTkLabel(self.root, text="File Name")
         file_name_label.grid(row=1, column=1)
-        file_path_entry = tk.Entry(self.root, textvariable=self.file_path)
+        file_path_entry = ctk.CTkEntry(self.root, textvariable=self.file_path)
         file_path_entry.grid(row=2, column=1)
 
         # Start measurement button
-        start_measurement_button = tk.Button(self.root, text="Start Measurement", command=self.start_measurement)
+        start_measurement_button = ctk.CTkButton(self.root, text="Start Measurement", command=self.start_measurement)
         start_measurement_button.grid(row=2, column=2)
 
         # Stop measurement button
-        stop_measurement_button = tk.Button(self.root, text="EMERGENCY Stop", command=self.stop_measurement)
+        stop_measurement_button = ctk.CTkButton(self.root, text="EMERGENCY Stop", command=self.stop_measurement)
         stop_measurement_button.grid(row=2, column=3)
 
     #draws the static plot
