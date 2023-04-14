@@ -78,8 +78,8 @@ def check_config(config):
         for key in required_keys:
             if key not in config:
                 return f"ERROR: {key} is missing in the config file."
-        if not isinstance(config.get('temperature_list'), (int, float, list)):
-            return "ERROR: Temperature list is not a number or a list."
+        if not isinstance(config.get('temperature_list'), list):
+            return "ERROR: Temperature list is not a list."
         if not isinstance(config.get('temperature_tolerance'), (int, float)):
             return "ERROR: Temperature tolerance is not a number."
             
