@@ -10,7 +10,7 @@ from sys import path
 path.append('../Curvetracer-Control-Software')
 from Backend.configLoader import *
 from Backend.plotForGUI import *
-#from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
+from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
 from Backend.externalDeviceControl import fug_clear
 from Backend.modes import temperature_sweep, no_temperature, initialize_hardware
 from Backend.saveData import check_and_create_file
@@ -143,7 +143,13 @@ class GUI(ctk.CTk):
     def choose_config_file(self):
         config_file_path = filedialog.askopenfilename()
         self.config = import_config(config_file_path)
+
+        # this legalizes the config
         self.config_to_input()
+        self.input_to_config_dict()
+        # update the dropdown menus
+        self.voltage_frame.change_options('')
+        self.temperature_frame.change_options('')
 
         self.redraw_canvas()
 
@@ -199,12 +205,13 @@ class GUI(ctk.CTk):
     #starts the measurement
     def start_measurement(self):
         self.input_to_config_dict() #update the config with the input values
-        print(self.config)
 
         valid_config = check_config(self.config)
         if valid_config != True:
             messagebox.showerror("Invalid config", valid_config)
             return
+        
+        print(self.config)
 
         #check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
 
@@ -241,28 +248,28 @@ class VoltageFrame(ctk.CTkFrame):
         self.mode_dropdown.grid(row=1, column=0, padx=10, sticky='nw')
 
         # Start voltage label
-        self.start_voltage_label = ctk.CTkLabel(self, text='Start Voltage', padx=10, pady=10)
+        self.start_voltage_label = ctk.CTkLabel(self, text='Start Voltage [V]', padx=10, pady=10)
         self.start_voltage_label.grid(row=2, column=0, padx=10, sticky='nesw')
         # Start voltage input
         self.start_voltage_input = ctk.CTkEntry(self, textvariable=self.parent.start_voltage)
         self.start_voltage_input.grid(row=3, column=0, padx=10, sticky='nesw')
 
         # End voltage label
-        self.end_voltage_label = ctk.CTkLabel(self, text='End Voltage')
+        self.end_voltage_label = ctk.CTkLabel(self, text='End Voltage [V]')
         self.end_voltage_label.grid(row=4, column=0, padx=10, sticky='nesw')
         # End voltage input
         self.end_voltage_input = ctk.CTkEntry(self, textvariable=self.parent.end_voltage)
         self.end_voltage_input.grid(row=5, column=0, padx=10, sticky='nesw')
 
         # Voltage step label
-        self.voltage_step_label = ctk.CTkLabel(self, text='Voltage Step')
+        self.voltage_step_label = ctk.CTkLabel(self, text='Voltage Step [V]')
         self.voltage_step_label.grid(row=6, column=0, padx=10, sticky='nesw')
         # Voltage step input
         self.voltage_step_input = ctk.CTkEntry(self, textvariable=self.parent.voltage_step)
         self.voltage_step_input.grid(row=7, column=0, padx=10, sticky='nesw')
 
         # Single Voltage label
-        self.single_voltage_label = ctk.CTkLabel(self, text='Single Voltage', padx=10, pady=10)
+        self.single_voltage_label = ctk.CTkLabel(self, text='Single Voltage [V]', padx=10, pady=10)
         self.single_voltage_label.grid(row=2, column=0, padx=10, sticky='nesw')
         self.single_voltage_label.grid_remove()
 
@@ -341,6 +348,10 @@ class TemperatureFrame(ctk.CTkFrame):
     
     def set_temperature_list(self, temperature_list):
         temperature_list_string = ""
+
+        if isinstance(temperature_list, (int, float)):
+            temperature_list =[temperature_list]
+
         for temperature in temperature_list:
             temperature_list_string += str(temperature) + ", "
         self.temperature_list_input.delete("0.0", "end")
@@ -380,23 +391,31 @@ class LimitResistorCurrentFrame(ctk.CTkFrame):
         self.limit_resistor_dropdown.grid(row=2, column=0, padx=10, sticky='nsw')
 
         # Input current label
-        self.input_current_label = ctk.CTkLabel(self, text="Input Current")
+        self.input_current_label = ctk.CTkLabel(self, text="Input Current [A]")
         self.input_current_label.grid(row=1, column=1, padx=10, sticky='nesw')
         # Input current input
         self.input_current_input = ctk.CTkEntry(self, textvariable=self.parent.input_current)
         self.input_current_input.grid(row=2, column=1, padx=10, sticky='nesw')
 
         # Maximum current label
-        self.maximum_current_label = ctk.CTkLabel(self, text="Maximum Current")
+        self.maximum_current_label = ctk.CTkLabel(self, text="Maximum Current [A]")
         self.maximum_current_label.grid(row=3, column=1, padx=10, sticky='nesw')
         # Maximum current input
         self.maximum_current_input = ctk.CTkEntry(self, textvariable=self.parent.maximum_current)
         self.maximum_current_input.grid(row=4, column=1, padx=10, sticky='nesw')
 
     def get_limit_resistor(self):
-        return self.limit_resistor_dropdown.get()
+        #formats from "12 MΩ" to "12M" etc.
+        return self.limit_resistor_dropdown.get()[:-1].replace(" ", "")
     
     def set_limit_resistor(self, limit_resistor):
+        if limit_resistor == 'short':
+            self.limit_resistor_dropdown.set(limit_resistor)
+        #formats from "12M" to "12 MΩ" etc.
+        if limit_resistor[-1].isalpha():
+            limit_resistor = limit_resistor[:-1] + " " + limit_resistor[-1] + "Ω"
+        else:
+            limit_resistor = limit_resistor + " Ω"
         self.limit_resistor_dropdown.set(limit_resistor)
 
 #class for the save to file frame
@@ -479,9 +498,9 @@ class MeasurementThread(threading.Thread):
         initialize_hardware(self.config)
 
         if self.gui.config.get('has_temperature') == True:
-            temperature_sweep(self.gui.config)
+            fake_temperature_sweep(self.gui.config)
         else:
-            no_temperature(self.gui.config)
+            fake_no_temperature(self.gui.config)
         print("INFO: Measurement has finished!")
 
     def get_id(self): 
