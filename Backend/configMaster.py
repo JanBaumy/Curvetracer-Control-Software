@@ -2,7 +2,7 @@
 from configLoader import export_config
 import os
 
-measurement_folder = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop', 'SHA-Curvetracer Measurements')
+measurement_folder = os.path.join((os.environ['USERPROFILE']), 'Desktop', 'SHA-Curvetracer Measurements')
 
 no_temp_single_voltage = dict(has_temperature=False,\
                                 mode='voltage',\
@@ -11,8 +11,7 @@ no_temp_single_voltage = dict(has_temperature=False,\
                                 maximum_current=50e-6,\
                                 voltage=3000,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder,\
-                                plot_previous_data=False)
+                                save_folder=measurement_folder)
 
 no_temp_sweep_voltage = dict(has_temperature=False,\
                                 mode='voltage_sweep',\
@@ -23,8 +22,7 @@ no_temp_sweep_voltage = dict(has_temperature=False,\
                                 end_voltage=3000,\
                                 step=50,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder,\
-                                plot_previous_data=False)
+                                save_folder=measurement_folder)
 
 temp_single_voltage = dict(has_temperature=True,\
                                 mode='voltage',\
@@ -34,8 +32,7 @@ temp_single_voltage = dict(has_temperature=True,\
                                 temperature_list=[22, 32, 42, 52, 62, 72, 82, 92, 102],\
                                 temperature_tolerance=2,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder,\
-                                plot_previous_data=False)
+                                save_folder=measurement_folder)
 
 temp_sweep_voltage = dict(has_temperature=True,\
                                 mode='voltage_sweep',\
@@ -48,8 +45,7 @@ temp_sweep_voltage = dict(has_temperature=True,\
                                 end_voltage=3000,\
                                 step=50,\
                                 save_to_file=True,\
-                                save_folder=measurement_folder,\
-                                plot_previous_data=False)
+                                save_folder=measurement_folder)
 
 null_config = dict(has_temperature=True,\
                     mode='voltage_sweep',\
@@ -63,8 +59,7 @@ null_config = dict(has_temperature=True,\
                     step=0,\
                     save_to_file=False,\
                     save_folder=measurement_folder,
-                    file_path='null_measurement.csv',\
-                    plot_previous_data=False)
+                    file_path='null_measurement.csv')
 
 #export the configs
 print('Regenerating basic configs')
