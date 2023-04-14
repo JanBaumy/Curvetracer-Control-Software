@@ -177,4 +177,3 @@ def no_temperature(config):
             append_to_csv(file_path, csv_line)
 
     return True
-
