@@ -3,7 +3,7 @@
     "temperature_list": [20, 80],
     "temperature_tolerance": 2,
     "mode": "voltage_sweep",
-    "limit_resistor": "short",
+    "limit_resistor": "1M",
     "input_current": 0.005,
     "maximum_current": 1,
     "start_voltage": 0,
@@ -11,6 +11,6 @@
     "step": 100,
     "save_to_file": true,
     "save_folder": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer-Control-Software\\",
-    "file_path": "F:\\Eigene Dateien\\Arbeit\\Uni Bremen\\Masterarbeit\\Curvetracer-Control-Software\\TEST.csv",
+    "file_path": "TEST.csv",
     "plot_previous_data": false
 }

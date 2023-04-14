@@ -1,4 +1,1 @@
-{
-    "has_temperature": true,
-    "file_path": "null_measurement.csv"
-}
+{"has_temperature": true, "mode": "voltage_sweep", "limit_resistor": "short", "input_current": 0, "maximum_current": 0, "temperature_list": 0, "temperature_tolerance": 0, "start_voltage": 0, "end_voltage": 0, "step": 0, "save_to_file": false, "save_folder": "C:\\Users\\Jan\\Desktop\\SHA-Curvetracer Measurements", "file_path": "null_measurement.csv", "plot_previous_data": false}
