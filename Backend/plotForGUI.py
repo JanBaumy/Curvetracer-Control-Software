@@ -5,9 +5,9 @@ import numpy as np
 import os
 
 #read file (returns empty data when no file exists)
-def get_raw_data(file_path, previous_lines):
+def get_raw_data(file_path):
     if os.path.exists(file_path):
-        data = np.genfromtxt(file_path, delimiter=';', skip_header=previous_lines)
+        data = np.genfromtxt(file_path, delimiter=';', skip_header=1)
         return data
     else:
         return np.empty(shape=(0,0))
@@ -48,10 +48,10 @@ def extract_data(data, has_temperature):
         return ((range(len(voltage)), voltage), (voltage, current))
         
 #update function needs the axs object and data in the format (voltage, current (,temperature))
-def update(i, axs, previous_lines, config):
+def update(i, axs, config):
     file_path = config.get('file_path')
     has_temperature = True if config.get('has_temperature') == True else False
-    data = get_raw_data(file_path, previous_lines)
+    data = get_raw_data(file_path)
     #only plot when there is data
     if data.size > 0:
         animation_data = extract_data(data, has_temperature)
