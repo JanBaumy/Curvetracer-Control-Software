@@ -27,6 +27,7 @@ class GUI:
     def __init__(self):
         self.root = ctk.CTk()
         self.root.title("Curvetracer Control Software")
+        self.root.resizable(True, True)
         #make the program stop upon closing the window
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
@@ -64,114 +65,20 @@ class GUI:
     #populates the GUI with widgets
     def create_widgets(self):
         # Voltage sweep frame
-        voltage_sweep_frame = ctk.CTkFrame(self.root)
-        voltage_sweep_frame.grid(row=0, column=0, sticky='nw', columnspan=3)
-        # Voltage sweep label
-        voltage_sweep_label = ctk.CTkLabel(voltage_sweep_frame, text="Voltage Sweep", font=("Helvetica", 16))
-        voltage_sweep_label.grid(row=0, column=0, sticky='nw')
-
-        # Start voltage label
-        start_voltage_label = ctk.CTkLabel(voltage_sweep_frame, text="Start Voltage")
-        start_voltage_label.grid(row=1, column=0, sticky='nw')
-        # Start voltage input
-        start_voltage_input = ctk.CTkEntry(voltage_sweep_frame)
-        start_voltage_input.grid(row=2, column=0, sticky='nw')
-
-        # End voltage label
-        end_voltage_label = ctk.CTkLabel(voltage_sweep_frame, text="End Voltage")
-        end_voltage_label.grid(row=3, column=0, sticky='nw')
-        # End voltage input
-        end_voltage_input = ctk.CTkEntry(voltage_sweep_frame)
-        end_voltage_input.grid(row=4, column=0, sticky='nw')
-
-        # Voltage step label
-        voltage_step_label = ctk.CTkLabel(voltage_sweep_frame, text="Voltage Step")
-        voltage_step_label.grid(row=5, column=0, sticky='nw')
-        # Voltage step input
-        voltage_step_input = ctk.CTkEntry(voltage_sweep_frame)
-        voltage_step_input.grid(row=6, column=0, sticky='nw')
-
+        voltage_sweep_frame = VoltageSweepFrame(self.root, header_name='Voltage Sweep')
+        voltage_sweep_frame.grid(row=0, column=0, sticky='nesw')
         #--------------------------------------------
         # Temperature frame
-        temperature_frame = ctk.CTkFrame(self.root)
-        temperature_frame.grid(row=0, column=1, sticky='nw')
-        # Temperature label
-        temperature_label = ctk.CTkLabel(temperature_frame, text="Temperature", font=("Helvetica", 16))
-        temperature_label.grid(row=0, column=0, sticky='nw')
-
-        # Temperature dropdown menu
-        temperature_dropdown = ctk.CTkOptionMenu(temperature_frame, values=["With Temperature", "Without Temperature"])
-        temperature_dropdown.grid(row=1, column=0, sticky='nw')
-
-        # Temperature list label
-        temperature_list_label = ctk.CTkLabel(temperature_frame, text="Temperature List")
-        temperature_list_label.grid(row=2, column=0, sticky='nw')
-        # Temperature list input
-        temperature_list_input = ctk.CTkEntry(temperature_frame, height=100)
-        temperature_list_input.grid(row=3, column=0, sticky='nw')
-
-        # Temperature tolerance label
-        temperature_tolerance_label = ctk.CTkLabel(temperature_frame, text="Temperature Tolerance")
-        temperature_tolerance_label.grid(row=4, column=0, sticky='nw')
-        # Temperature tolerance input
-        temperature_tolerance_input = ctk.CTkEntry(temperature_frame)
-        temperature_tolerance_input.grid(row=5, column=0, sticky='nw')
-
+        temperature_frame = TemperatureFrame(self.root, header_name='Temperature')
+        temperature_frame.grid(row=0, column=1, sticky='nesw')
         #--------------------------------------------
         # Limit resistor and input current frame
-        resistor_and_current_frame = ctk.CTkFrame(self.root)
-        resistor_and_current_frame.grid(row=1, column=0, sticky='nw')
-        # Limit resistor and input current frame label
-        resistor_and_current_label = ctk.CTkLabel(resistor_and_current_frame, text="Limit Resistor and Input Current", font=("Helvetica", 16))
-        resistor_and_current_label.grid(row=0, column=0, sticky='nw')
-
-        # Limit resistor label
-        limit_resistor_label = ctk.CTkLabel(resistor_and_current_frame, text="Limit Resistor")
-        limit_resistor_label.grid(row=1, column=0, sticky='nw')
-        # Limit resistor dropdown menu
-        limit_resistor_dropdown = ctk.CTkOptionMenu(resistor_and_current_frame, values=["short", "12 MΩ", "120 MΩ", "1.2 GΩ", "12 GΩ", "120 GΩ"])
-        limit_resistor_dropdown.grid(row=2, column=0, sticky='nw')
-
-        # Input current label
-        input_current_label = ctk.CTkLabel(resistor_and_current_frame, text="Input Current")
-        input_current_label.grid(row=3, column=0, sticky='nw')
-        # Input current input
-        input_current_input = ctk.CTkEntry(resistor_and_current_frame)
-        input_current_input.grid(row=4, column=0, sticky='nw')
-
-        # Maximum current label
-        maximum_current_label = ctk.CTkLabel(resistor_and_current_frame, text="Maximum Current")
-        maximum_current_label.grid(row=5, column=0, sticky='nw')
-        # Maximum current input
-        maximum_current_input = ctk.CTkEntry(resistor_and_current_frame)
-        maximum_current_input.grid(row=6, column=0, sticky='nw')
-
+        resistor_and_current_frame = LimitResistorCurrentFrame(self.root, header_name='Limit Resistor and Current Control')
+        resistor_and_current_frame.grid(row=1, column=0, sticky='nesw', columnspan=2)
         #--------------------------------------------
-        # Safe to file frame
-        safe_to_file_frame = ctk.CTkFrame(self.root)
-        safe_to_file_frame.grid(row=2, column=0, sticky='nw')
-        # Safe to file frame label
-        safe_to_file_label = ctk.CTkLabel(safe_to_file_frame, text="Safe to File", font=("Helvetica", 16))
-        safe_to_file_label.grid(row=0, column=0, sticky='nw')
-
-        # Safe to file checkbox
-        safe_to_file_checkbox = ctk.CTkCheckBox(safe_to_file_frame, text="Safe to File")
-        safe_to_file_checkbox.grid(row=1, column=0, sticky='nw')
-
-        # Safe to file path label
-        safe_to_file_path_label = ctk.CTkLabel(safe_to_file_frame, text="Safe to File Path")
-        safe_to_file_path_label.grid(row=2, column=0, sticky='nw')
-        # Safe to file path input
-        safe_to_file_path_input = ctk.CTkButton(safe_to_file_frame, text="Choose File Path")
-        safe_to_file_path_input.grid(row=3, column=0, sticky='nw')
-
-        # Safe to file name label
-        safe_to_file_name_label = ctk.CTkLabel(safe_to_file_frame, text="Safe to File Name")
-        safe_to_file_name_label.grid(row=4, column=0, sticky='nw')
-        # Safe to file name input
-        safe_to_file_name_input = ctk.CTkEntry(safe_to_file_frame)
-        safe_to_file_name_input.grid(row=5, column=0, sticky='nw')
-
+        # Save to file frame
+        save_to_file_frame = SaveToFileFrame(self.root, header_name='Save to File')
+        save_to_file_frame.grid(row=2, column=0, sticky='nw', columnspan=2)
         #--------------------------------------------
         # # Choose config file button
         # choose_config_file_button = ctk.CTkButton(self.root, text="Choose Config File", command=self.choose_config_file)
@@ -265,6 +172,136 @@ class GUI:
 
             self.animation_thread.join()
 
+#class for the voltage sweep frame
+class VoltageSweepFrame(ctk.CTkFrame):
+    def __init__(self, *args, header_name, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.header_name = header_name
+        # Voltage sweep label
+        voltage_sweep_label = ctk.CTkLabel(self, text=self.header_name, font=("Helvetica", 16))
+        voltage_sweep_label.grid(row=0, column=0, sticky='nesw')
+
+        # Start voltage label
+        start_voltage_label = ctk.CTkLabel(self, text="Start Voltage", padx=10, pady=10)
+        start_voltage_label.grid(row=1, column=0, sticky='nesw')
+        # Start voltage input
+        start_voltage_input = ctk.CTkEntry(self)
+        start_voltage_input.grid(row=2, column=0, sticky='nesw')
+
+        # End voltage label
+        end_voltage_label = ctk.CTkLabel(self, text="End Voltage")
+        end_voltage_label.grid(row=3, column=0, sticky='nesw')
+        # End voltage input
+        end_voltage_input = ctk.CTkEntry(self)
+        end_voltage_input.grid(row=4, column=0, sticky='nesw')
+
+        # Voltage step label
+        voltage_step_label = ctk.CTkLabel(self, text="Voltage Step")
+        voltage_step_label.grid(row=5, column=0, sticky='nesw')
+        # Voltage step input
+        voltage_step_input = ctk.CTkEntry(self)
+        voltage_step_input.grid(row=6, column=0, sticky='nesw')
+
+#class for the single voltage frame
+class SingleVoltageFrame(ctk.CTkFrame):
+    def __init__(self, *args, header_name, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.header_name = header_name
+        voltage_label = ctk.CTkLabel(self, text=self.header_name, font=("Helvetica", 16))
+        voltage_label.grid(row=0, column=0, sticky='nesw')
+        # Start voltage label
+        voltage_label = ctk.CTkLabel(self, text="Voltage", padx=10, pady=10)
+        voltage_label.grid(row=1, column=0, sticky='nesw')
+
+#class for the temperature frame
+class TemperatureFrame(ctk.CTkFrame):
+    def __init__(self, *args, header_name, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.header_name = header_name
+        # Temperature label
+        temperature_label = ctk.CTkLabel(self, text="Temperature", font=("Helvetica", 16))
+        temperature_label.grid(row=0, column=0, sticky='nw')
+
+        # Temperature dropdown menu
+        temperature_dropdown = ctk.CTkOptionMenu(self, values=["With Temperature", "Without Temperature"])
+        temperature_dropdown.grid(row=1, column=0, sticky='nw')
+
+        # Temperature list label
+        temperature_list_label = ctk.CTkLabel(self, text="Temperature List")
+        temperature_list_label.grid(row=2, column=0, sticky='nw')
+        # Temperature list input
+        temperature_list_input = ctk.CTkTextbox(self, height=100)
+        temperature_list_input.grid(row=3, column=0, sticky='nw')
+
+        # Temperature tolerance label
+        temperature_tolerance_label = ctk.CTkLabel(self, text="Temperature Tolerance")
+        temperature_tolerance_label.grid(row=4, column=0, sticky='nw')
+        # Temperature tolerance input
+        temperature_tolerance_input = ctk.CTkEntry(self)
+        temperature_tolerance_input.grid(row=5, column=0, sticky='nw')
+
+#class for the limit resistor and current frame
+class LimitResistorCurrentFrame(ctk.CTkFrame):
+    def __init__(self, *args, header_name, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.header_name = header_name
+        # Limit resistor and input current frame label
+        resistor_and_current_label = ctk.CTkLabel(self, text="Limit Resistor and Input Current", font=("Helvetica", 16))
+        resistor_and_current_label.grid(row=0, column=0, sticky='nw')
+
+        # Limit resistor label
+        limit_resistor_label = ctk.CTkLabel(self, text="Limit Resistor")
+        limit_resistor_label.grid(row=1, column=0, sticky='nw')
+        # Limit resistor dropdown menu
+        limit_resistor_dropdown = ctk.CTkOptionMenu(self, values=["short", "12 MΩ", "120 MΩ", "1.2 GΩ", "12 GΩ", "120 GΩ"])
+        limit_resistor_dropdown.grid(row=2, column=0, sticky='nw')
+
+        # Input current label
+        input_current_label = ctk.CTkLabel(self, text="Input Current")
+        input_current_label.grid(row=1, column=1, sticky='nw')
+        # Input current input
+        input_current_input = ctk.CTkEntry(self)
+        input_current_input.grid(row=2, column=1, sticky='nw')
+
+        # Maximum current label
+        maximum_current_label = ctk.CTkLabel(self, text="Maximum Current")
+        maximum_current_label.grid(row=3, column=1, sticky='nw')
+        # Maximum current input
+        maximum_current_input = ctk.CTkEntry(self)
+        maximum_current_input.grid(row=4, column=1, sticky='nw')
+
+#class for the save to file frame
+class SaveToFileFrame(ctk.CTkFrame):
+    def __init__(self, *args, header_name, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.header_name = header_name
+        # Save to file frame label
+        save_to_file_label = ctk.CTkLabel(self, text="Save to File", font=("Helvetica", 16))
+        save_to_file_label.grid(row=0, column=0, sticky='nw')
+
+        # save to file checkbox
+        save_to_file_checkbox = ctk.CTkCheckBox(self, text="Save to File")
+        save_to_file_checkbox.grid(row=1, column=0, sticky='nw')
+
+        # save to file path label
+        save_to_file_path_label = ctk.CTkLabel(self, text="Save to File Path")
+        save_to_file_path_label.grid(row=2, column=0, sticky='nw')
+        # save to file path input
+        save_to_file_path_input = ctk.CTkButton(self, text="Choose File Path")
+        save_to_file_path_input.grid(row=3, column=0, sticky='nw')
+
+        # save to file name label
+        save_to_file_name_label = ctk.CTkLabel(self, text="Save to File Name")
+        save_to_file_name_label.grid(row=4, column=0, sticky='nw')
+        # save to file name input
+        save_to_file_name_input = ctk.CTkEntry(self)
+        save_to_file_name_input.grid(row=5, column=0, sticky='nw')
+    
 #class to run the animation in a separate thread
 class AnimationThread(threading.Thread):
     def __init__(self, gui):
