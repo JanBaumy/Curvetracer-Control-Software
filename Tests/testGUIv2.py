@@ -43,6 +43,7 @@ class GUI(ctk.CTk):
         self.save_to_file = ctk.BooleanVar(value=True)
         self.save_folder = ctk.StringVar()
         self.file_path = ctk.StringVar(value=None)
+        self.file_name = ctk.StringVar(value=None)
 
         #create an initial config
         self.config = {'mode': 'voltage_sweep', 'has_temperature': True, 'file_path': 'null_measurement.csv'}
@@ -171,6 +172,7 @@ class GUI(ctk.CTk):
         self.config['step'] = self.voltage_step.get()
 
         self.config['save_to_file'] = self.save_to_file.get()
+        self.folder_and_file_to_path()
         self.config['save_folder'] = self.save_folder.get()
         self.config['file_path'] = self.file_path.get()
 
@@ -196,6 +198,23 @@ class GUI(ctk.CTk):
         self.save_to_file.set(self.config.get('save_to_file', True))
         self.save_folder.set(self.config.get('save_folder', os.path.join((os.environ['USERPROFILE']), 'Desktop', 'SHA-Curvetracer Measurements')))
         self.file_path.set(self.config.get('file_path', os.path.join((os.environ['USERPROFILE']), 'Desktop', 'SHA-Curvetracer Measurements', 'measurement.csv')))
+
+    #function to check the save_folder and file_path variables and concatenate them if necessary
+    def folder_and_file_to_path(self):
+        #check if there is any save folder given
+        if self.save_folder.get() == '':
+            self.save_folder.set(os.path.join((os.environ['USERPROFILE']), 'Desktop', 'SHA-Curvetracer Measurements', '/'))
+
+        #ensure it ends with a backslash
+        if self.save_folder.get()[-1] != '/':
+            self.save_folder.set(self.save_folder.get() + '/')
+
+        #check if the file_name ends with .csv
+        if not self.file_name.get().endswith('.csv'):
+            self.file_name.set(self.file_name.get() + '.csv')
+
+        #check if the file path is in the save folder
+        self.file_path.set(self.save_folder.get() + self.file_name.get())
 
     #starts the animation
     def start_animation_thread(self):
@@ -389,6 +408,7 @@ class LimitResistorCurrentFrame(ctk.CTkFrame):
         # Limit resistor dropdown menu
         self.limit_resistor_dropdown = ctk.CTkOptionMenu(self, values=["short", "12 MΩ", "120 MΩ", "1.2 GΩ", "12 GΩ", "120 GΩ"])
         self.limit_resistor_dropdown.grid(row=2, column=0, padx=10, sticky='nsw')
+        self.parent.config['limit_resistor'] = "short"
 
         # Input current label
         self.input_current_label = ctk.CTkLabel(self, text="Input Current [A]")
@@ -437,14 +457,14 @@ class SaveToFileFrame(ctk.CTkFrame):
         self.save_to_file_path_label = ctk.CTkLabel(self, text="Folder Path")
         self.save_to_file_path_label.grid(row=2, column=0, padx=10, sticky='nw')
         # save to file path input
-        self.save_to_file_path_input = ctk.CTkButton(self, text="Choose Folder Path")
+        self.save_to_file_path_input = ctk.CTkButton(self, text="Choose Folder Path", command=self.chooseSaveFolder)
         self.save_to_file_path_input.grid(row=3, column=0, padx=10, sticky='nw')
 
         # save to file name label
         self.save_to_file_name_label = ctk.CTkLabel(self, text="File Name")
         self.save_to_file_name_label.grid(row=4, column=0, padx=10, sticky='nw')
         # save to file name input
-        self.save_to_file_name_input = ctk.CTkEntry(self, textvariable=self.parent.file_path)
+        self.save_to_file_name_input = ctk.CTkEntry(self, textvariable=self.parent.file_name)
         self.save_to_file_name_input.grid(row=5, column=0, padx=10, sticky='nw')
 
         #choose config file label
@@ -455,6 +475,9 @@ class SaveToFileFrame(ctk.CTkFrame):
         self.choose_config_file_button = ctk.CTkButton(self, text="Choose Config File", command=self.parent.choose_config_file)
         self.choose_config_file_button.grid(row=3, column=1, padx=10, sticky='nw')
 
+    def chooseSaveFolder(self):
+        self.parent.save_folder.set(filedialog.askdirectory())
+        
 #class for start/stop button frame
 class StartStopButtonFrame(ctk.CTkFrame):
     def __init__(self, *args, header_name, parent, **kwargs):
