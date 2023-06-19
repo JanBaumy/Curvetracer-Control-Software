@@ -1,11 +1,1 @@
-{
-    "has_temperature": false,
-    "mode": "voltage",
-    "limit_resistor": "12M",
-    "input_current": 0.005,
-    "maximum_current": 5e-05,
-    "voltage": 3000,
-    "save_to_file": true,
-    "save_folder": "C:\\Users\\Jan\\Desktop\\SHA-Curvetracer Measurements",
-    "plot_previous_data": false
-}
+{"has_temperature": false, "mode": "voltage", "limit_resistor": "12M", "input_current": 0.005, "maximum_current": 5e-05, "voltage": 3000, "save_to_file": true, "save_folder": "C:\\Users\\Hipe_Messplatz_Lap\\Desktop\\SHA-Curvetracer Measurements"}
