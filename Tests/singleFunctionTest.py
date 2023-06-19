@@ -9,6 +9,8 @@ def main():
     # print('INFO: Starting HUBER test')
     # if not huber_set_temperature(20):
     #     print('ERROR: Failed to set temperature to 20')
+    if not huber_enable_process_control(True):
+        print('ERROR: Failed to enable process temperature')
     if not huber_process_temperature(20):
         print('ERROR: Failed to set process temperature')
     # if not huber_set_temperature(0):

@@ -66,11 +66,11 @@ class GUI(ctk.CTk):
             if self.animation_thread != None:
                 self.animation_thread.stop()
 
-            # try:
-            #     if not fug_clear():
-            #         messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
-            # except:
-            #     messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
+            try:
+                if not fug_clear():
+                    messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
+            except:
+                messagebox.showerror("DANGER: High voltage", "Could not clear the voltage source.\nHIGH VOLTAGE may still be present.")
 
             #destroy window and stop session
             self.root.destroy()
@@ -166,10 +166,10 @@ class GUI(ctk.CTk):
         self.config['input_current'] = self.input_current.get()
         self.config['maximum_current'] = self.maximum_current.get()
 
-        self.config['voltage'] = self.voltage.get()
-        self.config['start_voltage'] = self.start_voltage.get()
-        self.config['end_voltage'] = self.end_voltage.get()
-        self.config['step'] = self.voltage_step.get()
+        self.config['voltage'] = int(self.voltage.get())
+        self.config['start_voltage'] = int(self.start_voltage.get())
+        self.config['end_voltage'] = int(self.end_voltage.get())
+        self.config['step'] = int(self.voltage_step.get())
 
         self.config['save_to_file'] = self.save_to_file.get()
         self.folder_and_file_to_path()
@@ -232,10 +232,10 @@ class GUI(ctk.CTk):
         
         print(self.config)
 
-        #check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
+        check_and_create_file(self.config.get('file_path'), has_temperature = self.config.get('has_temperature'))
 
-        #self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
-        #self.measurement_thread.start()
+        self.measurement_thread = MeasurementThread(self) #initialize a new measurement thread
+        self.measurement_thread.start()
 
     #emergency stop incase of physical damage
     def stop_measurement(self):
@@ -518,12 +518,12 @@ class MeasurementThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        initialize_hardware(self.config)
+        initialize_hardware(self.gui.config)
 
         if self.gui.config.get('has_temperature') == True:
-            fake_temperature_sweep(self.gui.config)
+            temperature_sweep(self.gui.config)
         else:
-            fake_no_temperature(self.gui.config)
+            no_temperature(self.gui.config)
         print("INFO: Measurement has finished!")
 
     def get_id(self): 
