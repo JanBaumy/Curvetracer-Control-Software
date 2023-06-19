@@ -52,6 +52,7 @@ def update(i, axs, config):
     file_path = config.get('file_path')
     has_temperature = True if config.get('has_temperature') == True else False
     data = get_raw_data(file_path)
+
     #only plot when there is data
     if data.size > 0:
         animation_data = extract_data(data, has_temperature)

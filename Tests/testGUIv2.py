@@ -96,25 +96,6 @@ class GUI(ctk.CTk):
         #--------------------------------------------
         self.start_stop_button_frame= StartStopButtonFrame(self.root, parent=self, header_name='Start/Stop')
         self.start_stop_button_frame.grid(row=2, column=2, sticky='nw')
-        #--------------------------------------------
-        # # Choose config file button
-        # choose_config_file_button = ctk.CTkButton(self.root, text="Choose Config File", command=self.choose_config_file)
-        # choose_config_file_button.grid(row=2, column=0)
-
-        # # File name input
-        # self.file_path = tk.StringVar()
-        # file_name_label = ctk.CTkLabel(self.root, text="File Name")
-        # file_name_label.grid(row=1, column=1)
-        # file_path_entry = ctk.CTkEntry(self.root, textvariable=self.file_path)
-        # file_path_entry.grid(row=2, column=1)
-
-        # # Start measurement button
-        # start_measurement_button = ctk.CTkButton(self.root, text="Start Measurement", command=self.start_measurement)
-        # start_measurement_button.grid(row=2, column=2)
-
-        # # Stop measurement button
-        # stop_measurement_button = ctk.CTkButton(self.root, text="EMERGENCY Stop", command=self.stop_measurement)
-        # stop_measurement_button.grid(row=2, column=3)
 
     #draws the static plot
     def create_canvas(self):
@@ -426,7 +407,11 @@ class LimitResistorCurrentFrame(ctk.CTkFrame):
 
     def get_limit_resistor(self):
         #formats from "12 MΩ" to "12M" etc.
-        return self.limit_resistor_dropdown.get()[:-1].replace(" ", "")
+        limit_resistor = self.limit_resistor_dropdown.get()
+        if limit_resistor == 'short':
+            return limit_resistor
+        return limit_resistor[:-1].replace(" ", "")
+
     
     def set_limit_resistor(self, limit_resistor):
         if limit_resistor == 'short':
@@ -445,13 +430,6 @@ class SaveToFileFrame(ctk.CTkFrame):
 
         self.header_name = header_name
         self.parent = parent
-        # Save to file frame label
-        self.save_to_file_label = ctk.CTkLabel(self, text="Save to File", font=("Helvetica", 16))
-        self.save_to_file_label.grid(row=0, column=0, padx=10, sticky='nw')
-
-        # save to file checkbox
-        self.save_to_file_checkbox = ctk.CTkCheckBox(self, text="Save to File", variable=self.parent.save_to_file)
-        self.save_to_file_checkbox.grid(row=1, column=0, padx=10, sticky='nw')
 
         # save to file path label
         self.save_to_file_path_label = ctk.CTkLabel(self, text="Folder Path")
@@ -503,7 +481,7 @@ class AnimationThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.config), cache_frame_data=False, interval=500)
+        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.config), cache_frame_data=False, interval=7000)
 
     def stop(self):
         self.gui.animation._stop()
