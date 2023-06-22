@@ -29,7 +29,11 @@ def initialize_hardware(config):
 
 #function to apply a single voltage and return the current
 def single_voltage(voltage):
+    old_voltage = int(fug_read('voltage'))
     fug_set_voltage(voltage)
+
+    if  old_voltage != voltage:
+        sleep(1) #wait for HV source to settle
 
     #wait for valid current measurement
     while not valid_current():
@@ -44,10 +48,11 @@ def voltage_sweep(start_voltage, end_voltage, step):
 
     #end voltage may never be exceeded
     while (start_voltage + step) <= end_voltage:
-        #FPGA takes time to measure
+
+        #FPGA takes approx. 6 seconds to measure, wait for new value to appear
         while current == last_current:
             current = single_voltage(start_voltage)
-            sleep(0.2)
+            
         last_current = current
         start_voltage += step
         yield start_voltage, current
@@ -124,7 +129,7 @@ def temperature_sweep(config):
                 if current >= maximum_current and maximum_current != 0:
                     print('INFO: Current limit exceeded')
                     fug_set_voltage(0)
-                    sleep(3) #wait for FPGA to read current
+                    sleep(6) #wait for FPGA to read current
                     break
   
             if save_to_file == True:
