@@ -29,11 +29,8 @@ def initialize_hardware(config):
 
 #function to apply a single voltage and return the current
 def single_voltage(voltage):
-    old_voltage = int(fug_read('voltage'))
     fug_set_voltage(voltage)
-
-    if  old_voltage != voltage:
-        sleep(1) #wait for HV source to settle
+    sleep(6) #wait for HV source to settle and FPGA to read current
 
     #wait for valid current measurement
     while not valid_current():
