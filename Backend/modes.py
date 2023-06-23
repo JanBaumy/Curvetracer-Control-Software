@@ -101,7 +101,6 @@ def temperature_sweep(config):
             if current >= maximum_current and maximum_current != 0:
                 print('INFO: Current limit exceeded')
                 fug_set_voltage(0)
-                sleep(3) #wait for FPGA to reset current
 
             #save the data to file
             if save_to_file == True:
@@ -129,7 +128,6 @@ def temperature_sweep(config):
                 if current >= maximum_current and maximum_current != 0:
                     print('INFO: Current limit exceeded')
                     fug_set_voltage(0)
-                    sleep(6) #wait for FPGA to read current
                     break
   
             if save_to_file == True:

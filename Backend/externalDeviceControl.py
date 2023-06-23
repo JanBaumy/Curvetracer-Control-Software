@@ -7,6 +7,7 @@ rio_host = 'rio://192.168.1.8/RIO0'
 rio_bitfile = 'FPGA Bitfile/InFpga.lvbitx'
 
 import socket
+from time import sleep
 from nifpga import Session
 
 #Generic function to send and receive a single string with TCP
@@ -161,6 +162,19 @@ def initialize_FPGA():
 
         #enable measurement
         start = session.registers['Boolean 2']
+        start.write(True)
+
+#function to reset the current measurement but keep the limit resistor, needed to stop continous measurement
+def reset_but_keep_limit_resistor():
+    with Session(bitfile=rio_bitfile, resource=rio_host) as session:
+        start = session.registers['Boolean 2']
+        valid_current = session.registers['Boolean']
+
+        #stop the measurement after current cycle
+        start.write(False)
+        sleep(6)
+        valid_current.write(False)
+
         start.write(True)
 
 #function to enable power to DUT
