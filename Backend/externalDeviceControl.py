@@ -4,7 +4,7 @@ huber_pilot_one_port = 8101
 fug_host = "192.168.1.42"
 fug_port = 4242
 rio_host = 'rio://192.168.1.8/RIO0'
-rio_bitfile = 'FPGA Bitfile/InFpga.lvbitx'
+rio_bitfile = 'FPGA Bitfile/FPGA Bitfile new.lvbitx'
 
 import socket
 from time import sleep
@@ -172,8 +172,10 @@ def reset_but_keep_limit_resistor():
 
         #stop the measurement after current cycle
         start.write(False)
-        sleep(6)
-        valid_current.write(False)
+
+        #wait for FPGA to reset "valid current" flag to false
+        while valid_current.read():
+            pass
 
         start.write(True)
 
