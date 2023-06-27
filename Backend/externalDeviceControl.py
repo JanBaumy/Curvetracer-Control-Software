@@ -160,12 +160,8 @@ def initialize_FPGA():
         session.reset()
         session.run()
 
-        #enable measurement
-        start = session.registers['Boolean 2']
-        start.write(True)
-
-#function to reset the current measurement but keep the limit resistor, needed to stop continous measurement
-def reset_but_keep_limit_resistor():
+#function to reset the current measurement but keep the limit resistor, needed to stop continuous measurement
+def reset_current_measurement():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
         start = session.registers['Boolean 2']
         valid_current = session.registers['Boolean']
@@ -225,20 +221,19 @@ def valid_current():
         return valid.read()
 
 #function to measure the current
-def measure_current():
+def read_current():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
         current = session.registers['Numeric 2']
 
         return current.read()
 
 #function to measure temperature
-def measure_temperature():
+def read_temperature():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
         pt100 = session.registers['Mod3/RTD0']
         pt100_value = float(pt100.read())
 
         #convert PT100 value to temperature with parameters gained from quadratic regression
         temperature = 0.00105938*(pt100_value**2) + 2.3448*pt100_value - 245.092
-
 
     return temperature

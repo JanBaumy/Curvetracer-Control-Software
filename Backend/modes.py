@@ -32,27 +32,23 @@ def single_voltage(voltage):
     fug_set_voltage(voltage)
 
     #reset the FPGA for a new measurement
-    reset_but_keep_limit_resistor()
+    reset_current_measurement()
 
     #wait for valid current measurement
     while not valid_current():
         pass
 
-    current = measure_current()
+    current = read_current()
     return current
 
 #function to generate the voltage sweep (used as generator function)
 def voltage_sweep(start_voltage, end_voltage, step):
-    current, last_current = 0, 0
+    current = 0
 
     #end voltage may never be exceeded
     while (start_voltage + step) <= end_voltage:
+        current = single_voltage(start_voltage)
 
-        #FPGA takes approx. 6 seconds to measure, wait for new value to appear
-        while current == last_current:
-            current = single_voltage(start_voltage)
-            
-        last_current = current
         start_voltage += step
         yield start_voltage, current
 
@@ -76,9 +72,9 @@ def temperature_sweep(config):
 
         #wait for temperature to be reached
         while not set_temperature_reached(set_temperature, temperature_tolerance):
-            print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(measure_temperature(), 3)}')
+            print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(read_temperature(), 3)}')
             sleep(5)
-        print(f'INFO: Temperature reached: {round(measure_temperature(), 3)}')
+        print(f'INFO: Temperature reached: {round(read_temperature(), 3)}')
 
 
         #start the corresponding measurement
@@ -87,7 +83,7 @@ def temperature_sweep(config):
             voltage = config.get('voltage')
             
             #measurement
-            actual_temperature = round(measure_temperature(), 3)
+            actual_temperature = round(read_temperature(), 3)
             dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
             current = single_voltage(voltage)
 
@@ -115,7 +111,7 @@ def temperature_sweep(config):
 
             #generator function returns the applied voltage and the measured current
             for voltage, current in voltage_sweep(start_voltage, end_voltage, step):
-                actual_temperature = round(measure_temperature(), 3)
+                actual_temperature = round(read_temperature(), 3)
                 dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
 
                 #make a line to save to csv
