@@ -4,7 +4,7 @@ huber_pilot_one_port = 8101
 fug_host = "192.168.1.42"
 fug_port = 4242
 rio_host = 'rio://192.168.1.8/RIO0'
-rio_bitfile = 'FPGA Bitfile/FPGA Bitfile new.lvbitx'
+rio_bitfile = 'FPGA Bitfile/FPGA Bitfile v3 (Recalibrated).lvbitx'
 
 import socket
 from time import sleep
