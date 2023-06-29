@@ -48,9 +48,10 @@ def voltage_sweep(start_voltage, end_voltage, step):
     #end voltage may never be exceeded
     while (start_voltage + step) <= end_voltage:
         current = single_voltage(start_voltage)
+        actual_voltage = fug_read('voltage')
 
         start_voltage += step
-        yield start_voltage, current
+        yield actual_voltage, current
 
 #function to go through each temperature
 #config needs to be a dict with these keys: mode, limit_resistor AND EITHER voltage OR start_voltage, end_voltage, step
@@ -84,8 +85,9 @@ def temperature_sweep(config):
             
             #measurement
             actual_temperature = round(read_temperature(), 3)
-            dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
             current = single_voltage(voltage)
+            actual_voltage = fug_read('voltage')
+            dut_voltage = calculateDUTVoltage(set_voltage=actual_voltage, measured_current=current, limit_resistor=limit_resistor)
 
             #make a line to save to csv
             csv_line = [set_temperature, actual_temperature, dut_voltage, current]
@@ -110,9 +112,9 @@ def temperature_sweep(config):
             step = config.get('step')
 
             #generator function returns the applied voltage and the measured current
-            for voltage, current in voltage_sweep(start_voltage, end_voltage, step):
+            for actual_voltage, current in voltage_sweep(start_voltage, end_voltage, step):
                 actual_temperature = round(read_temperature(), 3)
-                dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
+                dut_voltage = calculateDUTVoltage(set_voltage=actual_voltage, measured_current=current, limit_resistor=limit_resistor)
 
                 #make a line to save to csv
                 csv_line = [set_temperature, actual_temperature, dut_voltage, current]
@@ -145,7 +147,8 @@ def no_temperature(config):
         voltage = config.get('voltage')
         
         current = single_voltage(voltage)
-        dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
+        actual_voltage = fug_read('voltage')
+        dut_voltage = calculateDUTVoltage(set_voltage=actual_voltage, measured_current=current, limit_resistor=limit_resistor)
 
         #make a line to save to csv
         csv_line = [dut_voltage, current]
@@ -162,8 +165,8 @@ def no_temperature(config):
         step = config.get('step')
 
         #generator function returns the applied voltage and the measured current
-        for voltage, current in voltage_sweep(start_voltage, end_voltage, step):
-            dut_voltage = calculateDUTVoltage(set_voltage=voltage, measured_current=current, limit_resistor=limit_resistor)
+        for actual_voltage, current in voltage_sweep(start_voltage, end_voltage, step):
+            dut_voltage = calculateDUTVoltage(set_voltage=actual_voltage, measured_current=current, limit_resistor=limit_resistor)
 
             #make a line to save to csv
             csv_line = [dut_voltage, current]
