@@ -10,7 +10,7 @@ from sys import path
 path.append('../Curvetracer-Control-Software')
 from Backend.configLoader import *
 from Backend.plotForGUI import *
-from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
+#from fakeTestFunctions import fake_no_temperature, fake_temperature_sweep
 from Backend.externalDeviceControl import fug_clear
 from Backend.modes import temperature_sweep, no_temperature, initialize_hardware
 from Backend.saveData import check_and_create_file
@@ -28,12 +28,12 @@ class GUI(ctk.CTk):
         self.animation = None #this needs to keep a reference to the animation object, otherwise it will be garbage collected
         self.previous_data = 1 #previous lines in data file
 
-        #set all of the variables
+        #set all of the variables to default values
         self.has_temperature = ctk.BooleanVar(value=True)
-        self.temperature_list = []
-        self.temperature_tolerance = ctk.DoubleVar(value=2)
+        self.temperature_list = [20, 20, 20, 20, 20]
+        self.temperature_tolerance = ctk.DoubleVar(value=0.6)
         self.mode = ctk.StringVar(value='voltage_sweep')
-        self.limit_resistor = ctk.DoubleVar(value='short')
+        self.limit_resistor = ctk.DoubleVar(value='12M')
         self.input_current = ctk.DoubleVar(value=5e-3)
         self.maximum_current = ctk.DoubleVar(value=50e-6)
         self.voltage = ctk.DoubleVar(value=0)
@@ -161,7 +161,7 @@ class GUI(ctk.CTk):
     def config_to_input(self):
         self.has_temperature.set(self.config.get('has_temperature', True))
         self.temperature_frame.set_temperature_list(self.config.get('temperature_list', [20]))
-        self.temperature_tolerance.set(self.config.get('temperature_tolerance', 2))
+        self.temperature_tolerance.set(self.config.get('temperature_tolerance', 0.6))
         self.temperature_frame.temperature_dropdown.set('With Temperature' if self.config.get('has_temperature', True) == True else 'Without Temperature')
 
         self.mode.set(self.config.get('mode', 'voltage_sweep'))

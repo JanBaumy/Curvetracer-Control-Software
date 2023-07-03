@@ -150,13 +150,15 @@ def fug_read(parameter):
         payload = '>M1?\r\n'
     else:
         return False
-
-    return tcp_send_receive(fug_host, fug_port, payload)
+    
+    # answer will be "M0: +X.XXXXXE+XX" or "M1: +X.XXXXXE+XX", so we need to remove the first 3 characters
+    return float(tcp_send_receive(fug_host, fug_port, payload)[3:])    
 
 #-----NI CompactRIO----- ----------------------------------------------------------------------
 #function to start the resistor limiting and current measuring FPGA
 def initialize_FPGA():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
+        session.download()
         session.reset()
         session.run()
 
@@ -226,6 +228,18 @@ def read_current():
         current = session.registers['Numeric 2']
 
         return current.read()
+    
+def read_current_dynamic_calibration():
+    with Session(bitfile=rio_bitfile, resource=rio_host) as session:
+        # ranges are 100pA, 10nA, 100nA, 1uA, 10uA, 100uA, 1mA
+        current_ranges = ['Numeric, Numeric 3, Numeric 4, Numeric 5, Numeric 6, Numeric 7, Numeric 8']
+        current_range_100pA = session.registers['Numeric'].read()
+        current_range_10nA = session.registers['Numeric 3'].read()
+        current_range_100nA = session.registers['Numeric 4'].read()
+        current_range_1uA = session.registers['Numeric 5'].read()
+        current_range_10uA = session.registers['Numeric 6'].read()
+        current_range_100uA = session.registers['Numeric 7'].read()
+        current_range_1mA = session.registers['Numeric 8'].read()
 
 #function to measure temperature
 def read_temperature():
