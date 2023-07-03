@@ -3,7 +3,7 @@ from time import sleep
 from Backend.externalDeviceControl import *
 from Backend.dataAnalysis import *
 from Backend.saveData import *
-import datetime
+from datetime import datetime
 
 
 def initialize_hardware(config):
@@ -31,16 +31,7 @@ def initialize_hardware(config):
 #function to apply a single voltage and return the current
 def single_voltage(voltage):
     fug_set_voltage(voltage)
-
-    #reset the FPGA for a new measurement
-    reset_current_measurement()
-
-    #wait for valid current measurement
-    while not valid_current():
-        pass
-
-    current = read_current()
-    return current
+    return read_current()
 
 #function to generate the voltage sweep (used as generator function)
 def voltage_sweep(start_voltage, end_voltage, step):
@@ -76,7 +67,7 @@ def temperature_sweep(config):
         while not set_temperature_reached(set_temperature, temperature_tolerance):
             print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(read_temperature(), 3)}')
             sleep(5)
-        print(f'{datetime.datetime.now().time()}: INFO: Temperature reached: {round(read_temperature(), 3)}')
+        print(f'{datetime.now().time()}: INFO: Temperature reached: {round(read_temperature(), 3)}')
 
 
         #start the corresponding measurement
