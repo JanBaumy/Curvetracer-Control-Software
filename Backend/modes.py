@@ -3,6 +3,7 @@ from time import sleep
 from Backend.externalDeviceControl import *
 from Backend.dataAnalysis import *
 from Backend.saveData import *
+import datetime
 
 
 def initialize_hardware(config):
@@ -75,7 +76,7 @@ def temperature_sweep(config):
         while not set_temperature_reached(set_temperature, temperature_tolerance):
             print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(read_temperature(), 3)}')
             sleep(5)
-        print(f'INFO: Temperature reached: {round(read_temperature(), 3)}')
+        print(f'{datetime.datetime.now().time()}: INFO: Temperature reached: {round(read_temperature(), 3)}')
 
 
         #start the corresponding measurement

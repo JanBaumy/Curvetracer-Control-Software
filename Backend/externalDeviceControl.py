@@ -158,6 +158,7 @@ def fug_read(parameter):
 #function to start the resistor limiting and current measuring FPGA
 def initialize_FPGA():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
+        session.download()
         session.reset()
         session.run()
 
