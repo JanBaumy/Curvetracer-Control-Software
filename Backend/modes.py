@@ -117,6 +117,7 @@ def temperature_sweep(config):
                 if current >= maximum_current and maximum_current != 0:
                     print('INFO: Current limit exceeded')
                     fug_set_voltage(0)
+                    sleep(10)
                     break
   
             if save_to_file == True:

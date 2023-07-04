@@ -4,7 +4,7 @@ huber_pilot_one_port = 8101
 fug_host = "192.168.1.42"
 fug_port = 4242
 rio_host = 'rio://192.168.1.8/RIO0'
-rio_bitfile = 'FPGA Bitfile/FPGA Bitfile v4 (external control).lvbitx'
+rio_bitfile = 'FPGA Bitfile/FPGA Bitfile v4.1.lvbitx'
 
 import socket
 from time import sleep
@@ -220,13 +220,14 @@ def valid_current():
 
 #function to measure the current
 def read_current():
-    optimal_current_range = False
+    found_current_range = False
 
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
         start = session.registers['Measure']
         valid_current = session.registers['Valid current']
         # keep measuring the current until the optimal range is found
-        while not optimal_current_range:
+        tries = 0
+        while not found_current_range and tries < 10:
             # reset the current measurement
             start.write(False)
             while valid_current.read(): # FPGA sets valid current to false itself
@@ -234,15 +235,25 @@ def read_current():
             start.write(True)
 
             # do the actual measurement
-            voltage_at_output = session.registers['Current'].read() # raw voltage at resistor
-            current_range = read_current_range(session)             # check which current range is active
+            while not valid_current.read():
+                pass
+            
+            sleep(0.3)
+            voltage_at_output_1 = session.registers['Current'].read() # raw voltage at resistor
+            sleep(0.3)
+            voltage_at_output_2 = session.registers['Current'].read()
+            voltage_at_output = (voltage_at_output_1 + voltage_at_output_2) / 2
+
+            current_range = read_current_range(session) # check which current range is active
             current = calculate_current(voltage_at_output, current_range) # current over resistor
-            best_current_range = determine_best_current_range(current)
+            best_current_range = find_best_current_range(current)
+
             if current_range == best_current_range: # check if current is in optimal range
-                optimal_current_range = True
+                found_current_range = True
             else:
                 switch_to_current_range(best_current_range, session)
-            print(f'Voltage at output: {voltage_at_output} V, Current: {current} A, Current range: {current_range[-1]}, Optimal current range: {best_current_range[-1]}')
+            tries += 1
+        print(f'Range: {current_range}, tries: {tries}, current: {current}')
         return float(current)
 
 # function to set the current range (must be called from an already open session) 
@@ -253,11 +264,18 @@ def switch_to_current_range(wanted_range, session):
     # disable all ranges
     for current_range in all_ranges:
         session.registers[current_range].write(False)
-    sleep(0.2) #wait for relays to disable
+    sleep(0.5) #wait for relays to disable
 
     #enable wanted range
     session.registers[wanted_range].write(True)
-    sleep(0.2) #wait for relay to enable
+    sleep(0.5) #wait for relay to enable
+
+def next_current_range(current_range):
+    if current_range[-1] == '7':
+        return 'Current range 1'
+    else:
+        next_range = current_range[:-1] + str(int(current_range[-1]) + 1)
+        return next_range
 
 # function to read which current range is enabled (must be called from an open session)
 def read_current_range(session):
@@ -271,27 +289,29 @@ def read_current_range(session):
 
 # function to calculate the current from the voltage over the resistor        
 def calculate_current(voltage_at_output, current_range):
-    #calculate current from voltage and current range
+    #calculate current from voltage, current range and calibration values
     if current_range == 'Current range 1':
         current = voltage_at_output / 1000
     elif current_range == 'Current range 2':
         current = voltage_at_output / 10_000
     elif current_range == 'Current range 3':
-        current = voltage_at_output / 100_000
+        current = float(voltage_at_output / 99_700) + 7e-7
     elif current_range == 'Current range 4':
-        current = voltage_at_output / 1_000_000
+        current = float(voltage_at_output / 1_000_000) + 1e-7
     elif current_range == 'Current range 5':
-        current = voltage_at_output / 10_000_000
+        current = voltage_at_output / 9_970_000
     elif current_range == 'Current range 6':
         current = voltage_at_output / 100_000_000
     elif current_range == 'Current range 7':
         current = voltage_at_output / 1_000_000_000
+        if current > 9.9e-10:
+            current = float(current) - 1e-10
     else:
         current = 0
 
-    return current
+    return float(current)
 
-def determine_best_current_range(current):
+def find_best_current_range(current):
     if current >= 1e-3: # over 1 mA
         return 'Current range 1'
     elif current >= 1e-4: # over 100 uA

@@ -481,7 +481,7 @@ class AnimationThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.config), cache_frame_data=False, interval=5500)
+        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.config), cache_frame_data=False, interval=800)
 
     def stop(self):
         self.gui.animation._stop()

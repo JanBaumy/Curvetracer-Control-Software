@@ -42,7 +42,10 @@ def main():
     set_limit_resistor('12M')
     read_all_registers()
     print(f'Valid current: {valid_current()}')
-    print(f'Current is: {read_current()}')
+    times = 0
+    while times < 10:
+        read_current()
+        times += 1
     print(f'Temperature is: {read_temperature()}')
 
     # return
