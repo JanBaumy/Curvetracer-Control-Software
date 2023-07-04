@@ -238,20 +238,26 @@ def read_current():
             while not valid_current.read():
                 pass
             
-            sleep(0.3)
+            # read the current twice and take an average
             voltage_at_output_1 = session.registers['Current'].read() # raw voltage at resistor
             sleep(0.3)
             voltage_at_output_2 = session.registers['Current'].read()
             voltage_at_output = (voltage_at_output_1 + voltage_at_output_2) / 2
 
             current_range = read_current_range(session) # check which current range is active
-            current = calculate_current(voltage_at_output, current_range) # current over resistor
-            best_current_range = find_best_current_range(current)
+            current, utilization = calculate_current(voltage_at_output, current_range) # current over resistor and utilization of current range
+            best_current_range = find_best_current_range(current) # find optimal current range for the measured current
 
-            if current_range == best_current_range: # check if current is in optimal range
+            # switching the current range
+            if current_range == best_current_range: # if current range is optimal, don't switch
                 found_current_range = True
-            else:
+            elif int(current_range[-1]) < int(best_current_range[-1]): # if more precision is needed, switch immediately
                 switch_to_current_range(best_current_range, session)
+            elif utilization >= 1.2: # if less precision is needed, only switch after the current range has exceeded its limit by 20%
+                switch_to_current_range(best_current_range, session)
+            else: # if the current range has exceeded its limit by less than 20%, don't switch
+                found_current_range = True
+
             tries += 1
         print(f'Range: {current_range}, tries: {tries}, current: {current}')
         return float(current)
@@ -290,26 +296,34 @@ def read_current_range(session):
 # function to calculate the current from the voltage over the resistor        
 def calculate_current(voltage_at_output, current_range):
     #calculate current from voltage, current range and calibration values
-    if current_range == 'Current range 1':
+    if current_range == 'Current range 1': # 10 mA
         current = voltage_at_output / 1000
-    elif current_range == 'Current range 2':
+        utilization = current / 1e-2
+    elif current_range == 'Current range 2': # 1 mA
         current = voltage_at_output / 10_000
-    elif current_range == 'Current range 3':
+        utilization = current / 1e-3
+    elif current_range == 'Current range 3': # 100 uA
         current = float(voltage_at_output / 99_700) + 7e-7
-    elif current_range == 'Current range 4':
+        utilization = current / 1e-4
+    elif current_range == 'Current range 4': # 10 uA
         current = float(voltage_at_output / 1_000_000) + 1e-7
-    elif current_range == 'Current range 5':
+        utilization = current / 1e-5
+    elif current_range == 'Current range 5': # 1 uA
         current = voltage_at_output / 9_970_000
-    elif current_range == 'Current range 6':
+        utilization = current / 1e-6
+    elif current_range == 'Current range 6': # 100 nA
         current = voltage_at_output / 100_000_000
-    elif current_range == 'Current range 7':
+        utilization = current / 1e-7
+    elif current_range == 'Current range 7': # 10 nA
         current = voltage_at_output / 1_000_000_000
         if current > 9.9e-10:
             current = float(current) - 1e-10
+        utilization = current / 1e-8
     else:
         current = 0
+        utilization = 0
 
-    return float(current)
+    return float(current), float(utilization)
 
 def find_best_current_range(current):
     if current >= 1e-3: # over 1 mA
