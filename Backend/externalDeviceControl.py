@@ -163,6 +163,16 @@ def initialize_FPGA():
         session.run()
         session.registers['Current range 1'].write(True) # start with highest current range
 
+def read_all_registers():
+    with Session(bitfile=rio_bitfile, resource=rio_host) as session:
+        # ranges are 10 nA, 100 nA, 1 uA, 10 uA, 100 uA, 1 mA, 10 mA
+        all_ranges = ['Current range 1', 'Current range 2', 'Current range 3', 'Current range 4', 'Current range 5', 'Current range 6', 'Current range 7']
+
+        # disable all ranges
+        for current_range in all_ranges:
+            print(session.registers[current_range].read())
+        #sleep(0.2) #wait for relays to disable
+
 #function to enable power to DUT
 def enable_power_FPGA(boolean):
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
@@ -211,10 +221,10 @@ def valid_current():
 #function to measure the current
 def read_current():
     optimal_current_range = False
-    start = session.registers['Measure']
-    valid_current = session.registers['Valid current']
 
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
+        start = session.registers['Measure']
+        valid_current = session.registers['Valid current']
         # keep measuring the current until the optimal range is found
         while not optimal_current_range:
             # reset the current measurement
@@ -227,12 +237,13 @@ def read_current():
             voltage_at_output = session.registers['Current'].read() # raw voltage at resistor
             current_range = read_current_range(session)             # check which current range is active
             current = calculate_current(voltage_at_output, current_range) # current over resistor
-            if current_range == determine_best_current_range(current): # check if current is in optimal range
+            best_current_range = determine_best_current_range(current)
+            if current_range == best_current_range: # check if current is in optimal range
                 optimal_current_range = True
             else:
-                switch_to_current_range(optimal_current_range, session)
-            print(f'Voltage at output: {voltage_at_output} V, Current: {current} A, Current range: {current_range[-1]}, Optimal current range: {optimal_current_range[-1]}')
-        return current
+                switch_to_current_range(best_current_range, session)
+            print(f'Voltage at output: {voltage_at_output} V, Current: {current} A, Current range: {current_range[-1]}, Optimal current range: {best_current_range[-1]}')
+        return float(current)
 
 # function to set the current range (must be called from an already open session) 
 def switch_to_current_range(wanted_range, session):
@@ -242,11 +253,11 @@ def switch_to_current_range(wanted_range, session):
     # disable all ranges
     for current_range in all_ranges:
         session.registers[current_range].write(False)
-    sleep(0.1) #wait for relays to disable
+    sleep(0.2) #wait for relays to disable
 
     #enable wanted range
     session.registers[wanted_range].write(True)
-    sleep(0.1) #wait for relay to enable
+    sleep(0.2) #wait for relay to enable
 
 # function to read which current range is enabled (must be called from an open session)
 def read_current_range(session):
@@ -282,19 +293,19 @@ def calculate_current(voltage_at_output, current_range):
 
 def determine_best_current_range(current):
     if current >= 1e-3: # over 1 mA
-        return 'Current range 7'
+        return 'Current range 1'
     elif current >= 1e-4: # over 100 uA
-        return 'Current range 6'
+        return 'Current range 2'
     elif current >= 1e-5: # over 10 uA
-        return 'Current range 5'
+        return 'Current range 3'
     elif current >= 1e-6: # over 1 uA
         return 'Current range 4'
     elif current >= 1e-7: # over 100 nA
-        return 'Current range 3'
+        return 'Current range 5'
     elif current >= 1e-8: # over 10 nA
-        return 'Current range 2'
+        return 'Current range 6'
     else: # under 10 nA
-        return 'Current range 1'
+        return 'Current range 7'
 
 #function to measure temperature
 def read_temperature():

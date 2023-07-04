@@ -19,7 +19,7 @@ def main():
     #     print('ERROR: Failed to set temperature to -50')
 # -----FUG DEVICE----- ----------------------------------------------------------------------
     print('INFO: Starting FUG test')
-    if not fug_set_voltage(100):
+    if not fug_set_voltage(500):
         print('ERROR: Failed to set voltage to 5')
     if not fug_set_current(5e-3):
         print('ERROR: Failed to set current to 5e-3')
@@ -40,6 +40,7 @@ def main():
     initialize_FPGA()
     enable_power_FPGA(True)
     set_limit_resistor('12M')
+    read_all_registers()
     print(f'Valid current: {valid_current()}')
     print(f'Current is: {read_current()}')
     print(f'Temperature is: {read_temperature()}')
