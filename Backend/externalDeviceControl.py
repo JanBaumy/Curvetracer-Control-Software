@@ -163,16 +163,6 @@ def initialize_FPGA():
         session.run()
         session.registers['Current range 1'].write(True) # start with highest current range
 
-def read_all_registers():
-    with Session(bitfile=rio_bitfile, resource=rio_host) as session:
-        # ranges are 10 nA, 100 nA, 1 uA, 10 uA, 100 uA, 1 mA, 10 mA
-        all_ranges = ['Current range 1', 'Current range 2', 'Current range 3', 'Current range 4', 'Current range 5', 'Current range 6', 'Current range 7']
-
-        # disable all ranges
-        for current_range in all_ranges:
-            print(session.registers[current_range].read())
-        #sleep(0.2) #wait for relays to disable
-
 #function to enable power to DUT
 def enable_power_FPGA(boolean):
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
@@ -226,8 +216,9 @@ def read_current():
         start = session.registers['Measure']
         valid_current = session.registers['Valid current']
         # keep measuring the current until the optimal range is found
-        tries = 0
-        while not found_current_range and tries < 10:
+        current_range_tries = 0
+
+        while not found_current_range and current_range_tries < 10:
             # reset the current measurement
             start.write(False)
             while valid_current.read(): # FPGA sets valid current to false itself
@@ -235,14 +226,13 @@ def read_current():
             start.write(True)
 
             # do the actual measurement
-            while not valid_current.read():
+            while not valid_current.read(): # wait fo current to appear at output
                 pass
             
-            # read the current twice and take an average
-            voltage_at_output_1 = session.registers['Current'].read() # raw voltage at resistor
+            voltage_at_output = session.registers['Current'].read()
             sleep(0.3)
-            voltage_at_output_2 = session.registers['Current'].read()
-            voltage_at_output = (voltage_at_output_1 + voltage_at_output_2) / 2
+            voltage_at_output += session.registers['Current'].read()
+            voltage_at_output /= 2 # take the average of two measurements
 
             current_range = read_current_range(session) # check which current range is active
             current, utilization = calculate_current(voltage_at_output, current_range) # current over resistor and utilization of current range
@@ -253,13 +243,12 @@ def read_current():
                 found_current_range = True
             elif int(current_range[-1]) < int(best_current_range[-1]): # if more precision is needed, switch immediately
                 switch_to_current_range(best_current_range, session)
-            elif utilization >= 1.2: # if less precision is needed, only switch after the current range has exceeded its limit by 20%
+            elif utilization >= 1.05: # if less precision is needed, only switch after the current range has exceeded its limit by 5%
                 switch_to_current_range(best_current_range, session)
-            else: # if the current range has exceeded its limit by less than 20%, don't switch
+            else: # if the current range has exceeded its limit by less than 5%, don't switch
                 found_current_range = True
 
-            tries += 1
-        print(f'Range: {current_range}, tries: {tries}, current: {current}')
+            current_range_tries += 1
         return float(current)
 
 # function to set the current range (must be called from an already open session) 
@@ -276,26 +265,11 @@ def switch_to_current_range(wanted_range, session):
     session.registers[wanted_range].write(True)
     sleep(0.5) #wait for relay to enable
 
-def next_current_range(current_range):
-    if current_range[-1] == '7':
-        return 'Current range 1'
-    else:
-        next_range = current_range[:-1] + str(int(current_range[-1]) + 1)
-        return next_range
-
-# function to read which current range is enabled (must be called from an open session)
-def read_current_range(session):
-    # ranges are 10 nA, 100 nA, 1 uA, 10 uA, 100 uA, 1 mA, 10 mA
-    all_ranges = ['Current range 1', 'Current range 2', 'Current range 3', 'Current range 4', 'Current range 5', 'Current range 6', 'Current range 7']
-
-    #check which range is enabled
-    for current_range in all_ranges:
-        if session.registers[current_range].read():
-            return current_range
-
 # function to calculate the current from the voltage over the resistor        
 def calculate_current(voltage_at_output, current_range):
     #calculate current from voltage, current range and calibration values
+    voltage_at_output = float(voltage_at_output)
+
     if current_range == 'Current range 1': # 10 mA
         current = voltage_at_output / 1000
         utilization = current / 1e-2
@@ -303,10 +277,10 @@ def calculate_current(voltage_at_output, current_range):
         current = voltage_at_output / 10_000
         utilization = current / 1e-3
     elif current_range == 'Current range 3': # 100 uA
-        current = float(voltage_at_output / 99_700) + 7e-7
+        current = voltage_at_output / 99_700 + 7e-7
         utilization = current / 1e-4
     elif current_range == 'Current range 4': # 10 uA
-        current = float(voltage_at_output / 1_000_000) + 1e-7
+        current = voltage_at_output / 1_000_000 + 1e-7
         utilization = current / 1e-5
     elif current_range == 'Current range 5': # 1 uA
         current = voltage_at_output / 9_970_000
@@ -317,7 +291,7 @@ def calculate_current(voltage_at_output, current_range):
     elif current_range == 'Current range 7': # 10 nA
         current = voltage_at_output / 1_000_000_000
         if current > 9.9e-10:
-            current = float(current) - 1e-10
+            current -= 1e-10
         utilization = current / 1e-8
     else:
         current = 0
@@ -325,6 +299,7 @@ def calculate_current(voltage_at_output, current_range):
 
     return float(current), float(utilization)
 
+# function to determine the most suitable current range for a provided current
 def find_best_current_range(current):
     if current >= 1e-3: # over 1 mA
         return 'Current range 1'
@@ -340,6 +315,16 @@ def find_best_current_range(current):
         return 'Current range 6'
     else: # under 10 nA
         return 'Current range 7'
+
+# function to read which current range is enabled (must be called from an open session)
+def read_current_range(session):
+    # ranges are 10 nA, 100 nA, 1 uA, 10 uA, 100 uA, 1 mA, 10 mA
+    all_ranges = ['Current range 1', 'Current range 2', 'Current range 3', 'Current range 4', 'Current range 5', 'Current range 6', 'Current range 7']
+
+    #check which range is enabled
+    for current_range in all_ranges:
+        if session.registers[current_range].read():
+            return current_range
 
 #function to measure temperature
 def read_temperature():

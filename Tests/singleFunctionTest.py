@@ -40,7 +40,6 @@ def main():
     initialize_FPGA()
     enable_power_FPGA(True)
     set_limit_resistor('12M')
-    read_all_registers()
     print(f'Valid current: {valid_current()}')
     times = 0
     while times < 10:

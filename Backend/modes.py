@@ -1,7 +1,7 @@
 #higher level functions implementing all different modes
 from time import sleep
 from Backend.externalDeviceControl import *
-from Backend.dataAnalysis import *
+from Backend.dataAnalysis import calculateDUTVoltage, set_temperature_reached
 from Backend.saveData import *
 from datetime import datetime
 
