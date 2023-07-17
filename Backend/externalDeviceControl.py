@@ -160,8 +160,8 @@ def initialize_FPGA():
     with Session(bitfile=rio_bitfile, resource=rio_host) as session:
         session.download()
         session.reset()
-        session.run()
         session.registers['Current range 1'].write(True) # start with highest current range
+        session.run()
 
 #function to enable power to DUT
 def enable_power_FPGA(boolean):
@@ -277,10 +277,10 @@ def calculate_current(voltage_at_output, current_range):
         current = voltage_at_output / 10_000
         utilization = current / 1e-3
     elif current_range == 'Current range 3': # 100 uA
-        current = voltage_at_output / 99_700 + 7e-7
+        current = (voltage_at_output / 99_700) + 7e-7
         utilization = current / 1e-4
     elif current_range == 'Current range 4': # 10 uA
-        current = voltage_at_output / 1_000_000 + 1e-7
+        current = (voltage_at_output / 1_000_000) + 1e-7
         utilization = current / 1e-5
     elif current_range == 'Current range 5': # 1 uA
         current = voltage_at_output / 9_970_000
