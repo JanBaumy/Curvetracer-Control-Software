@@ -30,7 +30,7 @@ class GUI(ctk.CTk):
 
         #set all of the variables to default values
         self.has_temperature = ctk.BooleanVar(value=True)
-        self.temperature_list = [20, 20, 20, 20, 20]
+        self.temperature_list = ['20', '20', '20', '20', '20']
         self.temperature_tolerance = ctk.DoubleVar(value=0.6)
         self.mode = ctk.StringVar(value='voltage_sweep')
         self.limit_resistor = ctk.DoubleVar(value='12M')

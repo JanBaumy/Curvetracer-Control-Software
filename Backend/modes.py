@@ -55,9 +55,12 @@ def temperature_sweep(config):
     maximum_current = config.get('maximum_current')
     save_to_file = config.get('save_to_file')
     file_path = config.get('file_path')
+    measurement_number = 0
 
     #go through each temperature
     for set_temperature in temperature_list:
+        measurement_number +=1
+        print(f'{datetime.now().time()}: INFO: Starting measurement {measurement_number}: {set_temperature}°C')
         #ensure to set temperature correctly
         if not huber_set_temperature(set_temperature):
             print('ERROR: Failed to set temperature')
@@ -65,10 +68,9 @@ def temperature_sweep(config):
 
         #wait for temperature to be reached
         while not set_temperature_reached(set_temperature, temperature_tolerance):
-            print(f'INFO: Waiting for PT100 to reach temperature. Currently at {round(read_temperature(), 3)}')
+            print(f'{datetime.now().time()}: INFO: Waiting for PT100 to reach {set_temperature}. Currently at {round(read_temperature(), 3)}')               
             sleep(5)
         print(f'{datetime.now().time()}: INFO: Temperature reached: {round(read_temperature(), 3)}')
-
 
         #start the corresponding measurement
         if mode == 'voltage':
@@ -116,9 +118,10 @@ def temperature_sweep(config):
                 #check if current exceeds limit
                 if current >= maximum_current and maximum_current != 0:
                     print('INFO: Current limit exceeded')
-                    fug_set_voltage(0)
-                    sleep(10)
                     break
+
+            fug_set_voltage(0)
+            sleep(10)
   
             if save_to_file == True:
                 csv_line = ["", "", "", ""]
