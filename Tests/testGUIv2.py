@@ -30,7 +30,7 @@ class GUI(ctk.CTk):
 
         #set all of the variables to default values
         self.has_temperature = ctk.BooleanVar(value=True)
-        self.temperature_list = [20, 20, 20, 20, 20]
+        self.temperature_list = ['20', '20', '20', '20', '20']
         self.temperature_tolerance = ctk.DoubleVar(value=0.6)
         self.mode = ctk.StringVar(value='voltage_sweep')
         self.limit_resistor = ctk.DoubleVar(value='12M')
@@ -481,7 +481,7 @@ class AnimationThread(threading.Thread):
         self.gui = gui
 
     def run(self):
-        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.config), cache_frame_data=False, interval=5500)
+        self.gui.animation = FuncAnimation(self.gui.fig, update, fargs=(self.gui.axs, self.gui.config), cache_frame_data=False, interval=800)
 
     def stop(self):
         self.gui.animation._stop()
